@@ -1,5 +1,8 @@
 # DEV 422 Final Project - Fantasy Sports Team Management System
 
+**Note on next Meeting:** TEAMS MEETING 2 - SUNDAY DEC 7 - 4 PM.
+
+
 ## Meeting Notes - First Team Meeting
 **Date:** 4:45 PM – 3:15 PM  
 **Team Members:** Miles Griffith, Peter Troendle, Sean Miles
@@ -99,7 +102,5 @@
 
 ---
 
-**Note:** All tables use CamelCase for columns and PascalCase for table names.
-**Note:** All fonts use Sans Serif 12.
+**Note on Form:** All tables use CamelCase for columns and PascalCase for table names. All fonts use Sans Serif 12.
 
-**Note:** TEAMS MEETING 2 - SUNDAY DEC 7 - 4 PM.
