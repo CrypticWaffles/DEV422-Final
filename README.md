@@ -100,3 +100,6 @@
 ---
 
 **Note:** All tables use CamelCase for columns and PascalCase for table names.
+**Note:** All fonts use Sans Serif 12.
+
+**Note:** TEAMS MEETING 2 - SUNDAY DEC 7 - 4 PM.
