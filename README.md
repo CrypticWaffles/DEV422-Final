@@ -1,7 +1,7 @@
-# DEV 422 Final Project - Fantasy Sports Team Management System
 
 **Note on next Meeting:** TEAMS MEETING 2 - SUNDAY DEC 7 - 4 PM.
 
+# DEV 422 Final Project - Fantasy Sports Team Management System
 
 ## Meeting Notes - First Team Meeting
 **Date:** 4:45 PM – 3:15 PM  
@@ -18,7 +18,7 @@
 
 ## Responsibilities & Deliverables
 
-### Member 1: Team Management Service
+### Sean: Team Management Service
 **Responsibilities:**
 - Implement APIs for creating, updating, and listing teams.
 - Integrate with Player Management Service via REST API to fetch player details.
@@ -29,7 +29,7 @@
 - Azure deployment URL
 - Unit tests for team operations
 
-### Member 2: Player Management Service
+### Griffith: Player Management Service
 **Responsibilities:**
 - Implement APIs for player pool management (draft/release).
 - Notify Team Management Service when players are drafted/released.
@@ -40,7 +40,7 @@
 - Azure deployment URL
 - Unit tests for player operations
 
-### Member 3: Performance Tracking Service
+### Troendle: Performance Tracking Service
 **Responsibilities:**
 - Simulate competitions and update player stats.
 - Notify Leaderboard Service (if implemented).
