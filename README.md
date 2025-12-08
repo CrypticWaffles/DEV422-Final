@@ -1,12 +1,20 @@
 
 **Note on next Meeting:**  DEC 9    Meeting  4PM
  
-DEC 8 I am Providing the Azure SQL Configuration (Host the database in Azure SQL Database. Secure access using connection strings stored in Azure App Service settings)
+# DEV 422 Final Project - Fantasy Sports Team Management System
+
+
+## Meeting Notes - Second Team Meeting
+**Date:** Dec 7 4 PM – 4:15 PM  
+**Team Members:** Miles Griffith, Peter Troendle, Sean Miles
+
+1. Team project pushed
+2. Player Project
+3. Performance is now using the data 1. and 2. provide (Integration and Statistics) 
+- DEC 8 I am Providing the Azure SQL Secure access using connection strings stored in Azure App Service settings
+  
  
 
-TEAMS MEETING 2 - SUNDAY DEC 7 - 4 PM.
-
-# DEV 422 Final Project - Fantasy Sports Team Management System
 
 ## Meeting Notes - First Team Meeting
 **Date:** 4:45 PM – 3:15 PM  
