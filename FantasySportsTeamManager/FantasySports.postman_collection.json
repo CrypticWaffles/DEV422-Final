@@ -1,0 +1,204 @@
+{
+  "info": {
+    "name": "Fantasy Sports Team Manager \u2013 Combined APIs",
+    "_postman_id": "dev422-fantasy-collection",
+    "description": "Postman collection for Team Management, Player Management, and Performance Tracking services. Ports taken from launchSettings.json provided by user.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Team Management Service",
+      "item": [
+        {
+          "name": "List Teams",
+          "request": {
+            "method": "GET",
+            "url": "{{team_base_url}}/api/teams"
+          }
+        },
+        {
+          "name": "Graph",
+          "request": {
+            "method": "GET",
+            "url": "{{team_base_url}}/api/graph"
+          }
+        },
+        {
+          "name": "Get Team by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{team_base_url}}/api/teams/{{teamId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function(){ pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Team",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"teamName\": \"Test Team\"}"
+            },
+            "url": "{{team_base_url}}/api/teams"
+          }
+        },
+        {
+          "name": "Update Team",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"teamName\": \"Updated Team\"}"
+            },
+            "url": "{{team_base_url}}/api/teams/{{teamId}}"
+          }
+        },
+        {
+          "name": "Delete Team",
+          "request": {
+            "method": "DELETE",
+            "url": "{{team_base_url}}/api/teams/{{teamId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Player Management Service",
+      "item": [
+        {
+          "name": "List Players",
+          "request": {
+            "method": "GET",
+            "url": "{{player_base_url}}/api/players"
+          }
+        },
+        {
+          "name": "Graph",
+          "request": {
+            "method": "GET",
+            "url": "{{player_base_url}}/api/graph"
+          }
+        },
+        {
+          "name": "Get Player by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{player_base_url}}/api/players/{{playerId}}"
+          }
+        },
+        {
+          "name": "Draft Player",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"playerId\": 1, \"teamId\": 1}"
+            },
+            "url": "{{player_base_url}}/api/players/draft"
+          }
+        },
+        {
+          "name": "Release Player",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"playerId\": 1, \"teamId\": 1}"
+            },
+            "url": "{{player_base_url}}/api/players/release"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Performance Tracking Service",
+      "item": [
+        {
+          "name": "Get All Performance Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{perf_base_url}}/api/performance"
+          }
+        },
+        {
+          "name": "Get Player Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{perf_base_url}}/api/performance/{{playerId}}"
+          }
+        },
+        {
+          "name": "Simulate Competition",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"competitionName\": \"TestCup\"}"
+            },
+            "url": "{{perf_base_url}}/api/performance/simulate"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script placeholder"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Collection-level tests placeholder"
+        ]
+      }
+    }
+  ]
+}

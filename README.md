@@ -65,9 +65,33 @@
 - Azure deployment URL
 - Unit tests for performance updates
 
----
-
+--- 
 ## API Endpoints
+
+**port mapping based on the launchSettings.json files you shared for each service:**
+
+**Team Management Service**
+
+- HTTP: http://localhost:5014
+- HTTPS: https://localhost:7076
+- IIS Express (optional): http://localhost:15754 (SSL: 44398)
+
+
+**Player Management Service**
+
+- HTTP: http://localhost:5275
+- HTTPS: https://localhost:7063
+- IIS Express (optional): http://localhost:22980 (SSL: 44325)
+
+
+**Performance Tracking Service**
+
+- HTTP: http://localhost:19700
+- HTTPS: https://localhost:19699
+
+--- 
+
+
 
 ### Team Management Service
 - `GET /api/teams` → List all teams
