@@ -1,25 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PlayerManagementService;
-using TeamManagement.Model;
+using TeamManagementService.Model;
 using PlayerManagementService.Controllers;
-using TeamManagement.Data;
+using TeamManagementService.Data;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-namespace TeamManagement.Controllers
+namespace TeamManagementService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamManagementController : ControllerBase
+    public class TeamManagementServiceController : ControllerBase
     {
         private static readonly List<Team> _teams= new List<Team>();
-        private readonly TeamManagementContext context;
-        public TeamManagementController(TeamManagementContext teamManagementContext)
+        private readonly TeamManagementServiceContext context;
+        public TeamManagementServiceController(TeamManagementServiceContext TeamManagementServiceContext)
         {
-            context = teamManagementContext;
+            this.context = TeamManagementServiceContext;
         }
         [HttpGet("teams")]
-        public async Task<IActionResult> ListAllTeams()//Task<ActionResult<IEnumerable<Team>>> ListAllTeams()
+        public async Task<IActionResult> ListAllTeams()
         {
             return Ok(new
             {

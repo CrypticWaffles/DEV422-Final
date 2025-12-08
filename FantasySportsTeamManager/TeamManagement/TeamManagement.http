@@ -1,6 +1,0 @@
-@TeamManagement_HostAddress = http://localhost:5014
-
-GET {{TeamManagement_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

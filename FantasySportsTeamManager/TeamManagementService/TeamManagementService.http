@@ -1,0 +1,6 @@
+@TeamManagementService_HostAddress = http://localhost:5014
+
+GET {{TeamManagementService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

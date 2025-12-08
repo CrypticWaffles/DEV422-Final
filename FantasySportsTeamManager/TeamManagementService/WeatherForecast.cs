@@ -1,4 +1,4 @@
-namespace TeamManagement
+namespace TeamManagementService
 {
     public class WeatherForecast
     {
