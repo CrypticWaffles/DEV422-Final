@@ -2,282 +2,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fantasy Sports Team Management System</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fantasy Sports Team Management</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --card: #111827;
-      --accent: #22d3ee;
-      --accent-2: #60a5fa;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --danger: #ef4444;
-      --success: #10b981;
-    }
-    html, body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial; }
-    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
-    header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
-    header h1 { font-size: 1.6rem; margin: 0; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
-    .card { background: var(--card); border: 1px solid #1f2937; border-radius: 12px; padding: 16px; }
-    .card h2 { margin-top: 0; font-size: 1.2rem; }
-    .field { display: grid; gap: 6px; margin-bottom: 10px; }
-    .field label { color: var(--muted); font-size: 0.9rem; }
-    input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0b1220; color: var(--text); }
-    button { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border: none; color: #001427; font-weight: 700; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
-    button.secondary { background: #1f2937; color: var(--text); border: 1px solid #334155; }
-    .row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .log { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.9rem; background: #0b1220; border: 1px solid #334155; border-radius: 8px; padding: 10px; height: 180px; overflow: auto; }
-    .ok { color: var(--success); }
-    .err { color: var(--danger); }
-    .muted { color: var(--muted); }
-    .kbd { font-family: ui-monospace, monospace; background: #0b1220; border: 1px solid #334155; padding: 2px 6px; border-radius: 6px; }
-    footer { margin-top: 28px; color: var(--muted); font-size: 0.9rem; }
-    .pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #334155; background: #0b1220; border-radius: 999px; padding: 6px 10px; }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; color: #333; }
+    header { text-align: center; padding: 12px 0; background: #4CAF50; color: #fff; margin-bottom: 20px; }
+    section { margin-bottom: 24px; padding: 12px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+    h2 { margin-top: 0; }
+    input, select { padding: 10px; margin: 6px 0; width: 100%; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc; }
+    button { padding: 10px 16px; margin-top: 8px; background: #4CAF50; color: #fff; border: 0; border-radius: 4px; cursor: pointer; }
+    button.secondary { background: #2f7a32; }
+    button:hover { background: #45a049; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+    .results { margin-top: 12px; }
+    .results pre { background: #eee; padding: 10px; border-radius: 6px; white-space: pre-wrap; word-wrap: break-word; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Fantasy Sports Team Management System</h1>
-      <div class="pill">
-        <span class="muted">Environment</span>
-        <select id="envSelect" title="Environment">
-          <option value="dev">dev</option>
-          <option value="test">test</option>
-          <option value="prod">prod</option>
-        </select>
+  <header>
+    <h1>Fantasy Sports Team Management</h1>
+    <p>Manage your teams, draft players, and track performance!</p>
+  </header>
+
+  <!-- Service Endpoints -->
+  <section>
+    <h2>Service Endpoints</h2>
+    <div class="grid">
+      <div>
+        <label for="teamBase">Team Service Base URL</label>
+        <input id="teamBase" placeholder="https://team-svc.azurewebsites.net"/>
       </div>
-    </header>
-
-    <!-- SERVICE ENDPOINTS -->
-    <section class="card">
-      <h2>Service Endpoints</h2>
-      <p class="muted">Paste your Azure App Service base URLs here. This page saves them in <span class="kbd">localStorage</span>.</p>
-      <div class="grid">
-        <div>
-          <div class="field"><label for="teamBase">Team Management Base URL</label><input id="teamBase" placeholder="https://team-svc.azurewebsites.net" /></div>
-          <div class="field"><label for="playerBase">Player Management Base URL</label><input id="playerBase" placeholder="https://player-svc.azurewebsites.net" /></div>
-        </div>
-        <div>
-          <div class="field"><label for="perfBase">Performance Tracking Base URL</label><input id="perfBase" placeholder="https://perf-svc.azurewebsites.net" /></div>
-          <div class="field"><label for="lbBase">Leaderboard Base URL (optional)</label><input id="lbBase" placeholder="https://leaderboard-svc.azurewebsites.net" /></div>
-        </div>
+      <div>
+        <label for="playerBase">Player Service Base URL</label>
+        <input id="playerBase" placeholder="https://player-svc.azurewebsites.net"/>
       </div>
-      <div class="row"><button id="saveCfg">Save Config</button><button class="secondary" id="resetCfg">Reset</button></div>
-    </section>
-
-    <section class="grid">
-      <!-- TEAM MANAGEMENT -->
-      <div class="card">
-        <h2>Team Management</h2>
-        <div class="row">
-          <button id="btnTeamsList">List Teams (GET /api/teams)</button>
-          <button class="secondary" id="btnTeamsGraph">Graph (GET /api/graph)</button>
-        </div>
-        <hr />
-        <div class="field"><label for="teamName">New Team Name</label><input id="teamName" placeholder="e.g., Skyhawks" /></div>
-        <div class="row">
-          <button id="btnTeamCreate">Create Team (POST /api/teams)</button>
-        </div>
-        <hr />
-        <div class="grid">
-          <div class="field"><label for="teamId">Team ID</label><input id="teamId" placeholder="Team GUID/ID" /></div>
-          <div class="field"><label for="teamNameUpdate">Update Name</label><input id="teamNameUpdate" placeholder="New name" /></div>
-        </div>
-        <div class="row">
-          <button id="btnTeamGet">Get Team (GET /api/teams/{id})</button>
-          <button class="secondary" id="btnTeamUpdate">Update Team (PUT /api/teams/{id})</button>
-          <button class="secondary" id="btnTeamDelete">Delete Team (DELETE /api/teams/{id})</button>
-        </div>
-        <div id="teamLog" class="log" aria-live="polite"></div>
+      <div>
+        <label for="perfBase">Performance Service Base URL</label>
+        <input id="perfBase" placeholder="https://perf-svc.azurewebsites.net"/>
       </div>
-
-      <!-- PLAYER MANAGEMENT -->
-      <div class="card">
-        <h2>Player Management</h2>
-        <div class="row">
-          <button id="btnPlayersList">List Players (GET /api/players)</button>
-          <button class="secondary" id="btnPlayersGraph">Graph (GET /api/graph)</button>
-        </div>
-        <hr />
-        <div class="grid">
-          <div class="field"><label for="playerId">Player ID</label><input id="playerId" placeholder="Player GUID/ID" /></div>
-          <div class="field"><label for="playerIdDraft">Draft Player ID</label><input id="playerIdDraft" placeholder="Player GUID/ID" /></div>
-          <div class="field"><label for="teamIdDraft">Draft Team ID</label><input id="teamIdDraft" placeholder="Team GUID/ID" /></div>
-        </div>
-        <div class="row">
-          <button id="btnPlayerGet">Get Player (GET /api/players/{id})</button>
-          <button class="secondary" id="btnDraft">Draft (POST /api/players/draft)</button>
-          <button class="secondary" id="btnRelease">Release (POST /api/players/release)</button>
-        </div>
-        <div id="playerLog" class="log"></div>
+      <div>
+        <label for="lbBase">Leaderboard Service Base URL (optional)</label>
+        <input id="lbBase" placeholder="https://leaderboard-svc.azurewebsites.net"/>
       </div>
+    </div>
+    <div class="row">
+      <button id="saveCfg">Save</button>
+      <button class="secondary" id="resetCfg">Reset</button>
+    </div>
+  </section>
 
-      <!-- PERFORMANCE TRACKING -->
-      <div class="card">
-        <h2>Performance Tracking</h2>
-        <div class="row">
-          <button id="btnPerfList">Get All Stats (GET /api/performance)</button>
-        </div>
-        <hr />
-        <div class="grid">
-          <div class="field"><label for="perfPlayerId">Player ID</label><input id="perfPlayerId" placeholder="Player GUID/ID" /></div>
-          <div class="field"><label for="compName">Competition Name</label><input id="compName" placeholder="e.g., Week 1" /></div>
-        </div>
-        <div class="row">
-          <button id="btnPerfGet">Get Player Stats (GET /api/performance/{playerId})</button>
-          <button class="secondary" id="btnPerfSim">Simulate (POST /api/performance/simulate)</button>
-        </div>
-        <div id="perfLog" class="log"></div>
-      </div>
+  <!-- Team Management -->
+  <section id="team-management">
+    <h2>Team Management</h2>
+    <div class="row">
+      <button id="btnTeamsList">List Teams (GET /api/teams)</button>
+      <button class="secondary" id="btnTeamsGraph">Graph (GET /api/graph)</button>
+    </div>
+    <form id="create-team-form">
+      <label for="team-name">Create a New Team</label>
+      <input type="text" id="team-name" placeholder="Enter team name" required/>
+      <button type="submit">Create Team (POST /api/teams)</button>
+    </form>
+    <div class="grid">
+      <div><label for="team-id">Team ID</label><input id="team-id" placeholder="Team GUID/ID"/></div>
+      <div><label for="team-name-update">Update Name</label><input id="team-name-update" placeholder="New name"/></div>
+    </div>
+    <div class="row">
+      <button id="btnTeamGet">Get Team (GET /api/teams/{id})</button>
+      <button class="secondary" id="btnTeamUpdate">Update Team (PUT /api/teams/{id})</button>
+      <button class="secondary" id="btnTeamDelete">Delete Team (DELETE /api/teams/{id})</button>
+    </div>
+    <div class="results" id="team-results"></div>
+  </section>
 
-      <!-- LEADERBOARD (optional UI stub) -->
-      <div class="card">
-        <h2>Leaderboard (Optional)</h2>
-        <div class="row">
-          <button id="btnRank">Get Leaderboard (GET /api/leaderboard)</button>
-          <button class="secondary" id="btnLBHelp">Docs</button>
-        </div>
-        <div id="lbLog" class="log"></div>
-      </div>
-    </section>
+  <!-- Player Management -->
+  <section id="player-management">
+    <h2>Player Management</h2>
+    <div class="row">
+      <button id="btnPlayersList">List Players (GET /api/players)</button>
+      <button class="secondary" id="btnPlayersGraph">Graph (GET /api/graph)</button>
+    </div>
+    <div class="grid">
+      <div><label for="player-id">Get Player ID</label><input id="player-id" placeholder="Player GUID/ID"/></div>
+      <div><label for="player-id-draft">Draft Player ID</label><input id="player-id-draft" placeholder="Player GUID/ID"/></div>
+      <div><label for="team-id-draft">Draft Team ID</label><input id="team-id-draft" placeholder="Team GUID/ID"/></div>
+    </div>
+    <div class="row">
+      <button id="btnPlayerGet">Get Player (GET /api/players/{id})</button>
+      <button class="secondary" id="btnDraft">Draft (POST /api/players/draft)</button>
+      <button class="secondary" id="btnRelease">Release (POST /api/players/release)</button>
+    </div>
+    <div class="results" id="player-results"></div>
+  </section>
 
-    <!-- API DOCS SUMMARY -->
-    <section class="card">
-      <h2>API Summary (Aligned to Your Routes)</h2>
-      <ul>
-        <li><b>Team</b>
-          <ul class="muted">
-            <li>GET <span class="kbd">/api/teams</span></li>
-            <li>GET <span class="kbd">/api/graph</span></li>
-            <li>GET <span class="kbd">/api/teams/{id}</span></li>
-            <li>POST <span class="kbd">/api/teams</span> → { name }</li>
-            <li>PUT <span class="kbd">/api/teams/{id}</span> → { name }</li>
-            <li>DELETE <span class="kbd">/api/teams/{id}</span></li>
-          </ul>
-        </li>
-        <li><b>Players</b>
-          <ul class="muted">
-            <li>GET <span class="kbd">/api/players</span></li>
-            <li>GET <span class="kbd">/api/graph</span></li>
-            <li>GET <span class="kbd">/api/players/{id}</span></li>
-            <li>POST <span class="kbd">/api/players/draft</span> → { playerId, teamId }</li>
-            <li>POST <span class="kbd">/api/players/release</span> → { playerId }</li>
-          </ul>
-        </li>
-        <li><b>Performance</b>
-          <ul class="muted">
-            <li>GET <span class="kbd">/api/performance</span></li>
-            <li>GET <span class="kbd">/api/performance/{playerId}</span></li>
-            <li>POST <span class="kbd">/api/performance/simulate</span> → { name }</li>
-          </ul>
-        </li>
-      </ul>
-      <p class="muted">Adjust request bodies if your services expect additional fields.</p>
-    </section>
+  <!-- Performance Tracking -->
+  <section id="performance-tracking">
+    <h2>Performance Tracking</h2>
+    <div class="row">
+      <button id="btnPerfList">Get All Stats (GET /api/performance)</button>
+    </div>
+    <div class="grid">
+      <div><label for="perf-player-id">Player ID</label><input id="perf-player-id" placeholder="Player GUID/ID"/></div>
+      <div><label for="comp-name">Competition Name</label><input id="comp-name" placeholder="e.g., Week 1"/></div>
+    </div>
+    <div class="row">
+      <button id="btnPerfGet">Get Player Stats (GET /api/performance/{playerId})</button>
+      <button class="secondary" id="btnPerfSimulate">Simulate (POST /api/performance/simulate)</button>
+    </div>
+    <div class="results" id="competition-results"></div>
+  </section>
 
-    <footer>
-      <p>Store connection strings & downstream URLs in Azure App Service app settings. Inject auth (AAD/JWT/API keys) in the <span class="kbd">call()</span> helper below.</p>
-    </footer>
-  </div>
+  <!-- Leaderboard (optional) -->
+  <section id="leaderboard">
+    <h2>Leaderboard</h2>
+    <button id="view-leaderboard">Leaderboard (GET /api/leaderboard)</button>
+    <div class="results" id="leaderboard-results"></div>
+  </section>
 
   <script>
-    // ---------- Config ----------
-    const cfgKey = 'fantasy-sports-config-v2';
+    // -------- Config helpers --------
+    const cfgKey = 'fantasy-sports-index-v1';
     const byId = (id) => document.getElementById(id);
-
-    function readCfg() { try { return JSON.parse(localStorage.getItem(cfgKey)) || {}; } catch { return {}; } }
-    function writeCfg(cfg) { localStorage.setItem(cfgKey, JSON.stringify(cfg)); }
-    function loadCfg() {
-      const cfg = readCfg();
-      byId('envSelect').value = cfg.env || 'dev';
-      byId('teamBase').value   = cfg.teamBase   || '';
-      byId('playerBase').value = cfg.playerBase || '';
-      byId('perfBase').value   = cfg.perfBase   || '';
-      byId('lbBase').value     = cfg.lbBase     || '';
+    function readCfg(){ try{ return JSON.parse(localStorage.getItem(cfgKey)) || {}; } catch { return {}; } }
+    function writeCfg(cfg){ localStorage.setItem(cfgKey, JSON.stringify(cfg)); }
+    function loadCfg(){
+      const c = readCfg();
+      byId('teamBase').value   = c.teamBase   || '';
+      byId('playerBase').value = c.playerBase || '';
+      byId('perfBase').value   = c.perfBase   || '';
+      byId('lbBase').value     = c.lbBase     || '';
     }
-    function saveCfg() {
+    function saveCfg(){
       writeCfg({
-        env: byId('envSelect').value,
         teamBase: byId('teamBase').value.trim(),
         playerBase: byId('playerBase').value.trim(),
         perfBase: byId('perfBase').value.trim(),
         lbBase: byId('lbBase').value.trim(),
       });
-      toast('Config saved', 'ok');
+      alert('Config saved.');
     }
-    function resetCfg() { localStorage.removeItem(cfgKey); loadCfg(); toast('Config reset', 'ok'); }
+    function resetCfg(){ localStorage.removeItem(cfgKey); loadCfg(); alert('Config reset.'); }
     byId('saveCfg').onclick = saveCfg;
     byId('resetCfg').onclick = resetCfg;
+    function bases(){ const c = readCfg(); return { team:c.teamBase, player:c.playerBase, perf:c.perfBase, lb:c.lbBase }; }
 
-    // ---------- Helpers ----------
-    function toast(msg, cls='muted') {
-      console.log(msg);
-      const div = document.createElement('div'); div.className = cls; div.textContent = msg;
-      [byId('teamLog'), byId('playerLog'), byId('perfLog'), byId('lbLog')].forEach(l => l && l.appendChild(div.cloneNode(true)));
-    }
-    function setLog(el, data, ok=true) {
-      const pre = document.createElement('pre'); pre.className = ok ? 'ok' : 'err';
-      try { pre.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2); } catch { pre.textContent = String(data); }
-      el.prepend(pre);
-    }
-    async function call(method, base, path, body) {
-      const url = `${base}${path}`;
+    // -------- Fetch wrapper --------
+    async function call(method, base, path, body){
+      const url = base + path;
       const headers = { 'Content-Type': 'application/json' };
-      // Add Authorization if you protect APIs (e.g., headers['Authorization'] = 'Bearer ' + token)
+      // If you use auth, inject here:
+      // headers['Authorization'] = 'Bearer ' + token;
       const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined });
       const text = await res.text();
       let data = text; try { data = JSON.parse(text); } catch {}
       return { ok: res.ok, status: res.status, data };
     }
-    function bases() { const c = readCfg(); return { team: c.teamBase, player: c.playerBase, perf: c.perfBase, lb: c.lbBase }; }
+    function show(elId, data){ byId(elId).innerHTML = `<pre>${typeof data==='string' ? data : JSON.stringify(data, null, 2)}</pre>`; }
 
-    // ---------- Team ----------
-    byId('btnTeamsList').onclick = async () => {
-      const { team } = bases(); if (!team) return setLog(byId('teamLog'), 'Missing Team base URL', false);
-      const r = await call('GET', team, '/api/teams'); setLog(byId('teamLog'), r.data, r.ok);
-    };
-    byId('btnTeamsGraph').onclick = async () => {
-      const { team } = bases(); if (!team) return setLog(byId('teamLog'), 'Missing Team base URL', false);
-      const r = await call('GET', team, '/api/graph'); setLog(byId('teamLog'), r.data, r.ok);
-    };
-    byId('btnTeamCreate').onclick = async () => {
-      const { team } = bases(); const name = byId('teamName').value.trim();
-      if (!team || !name) return setLog(byId('teamLog'), 'Missing Team base URL or name', false);
-      const r = await call('POST', team, '/api/teams', { name }); setLog(byId('teamLog'), r.data, r.ok);
-    };
-    byId('btnTeamGet').onclick = async () => {
-      const { team } = bases(); const id = byId('teamId').value.trim();
-      if (!team || !id) return setLog(byId('teamLog'), 'Missing Team base URL or ID', false);
-      const r = await call('GET', team, `/api/teams/${id}`); setLog(byId('teamLog'), r.data, r.ok);
-    };
-    byId('btnTeamUpdate').onclick = async () => {
-      const { team } = bases(); const id = byId('teamId').value.trim(); const name = byId('teamNameUpdate').value.trim();
-      if (!team || !id || !name) return setLog(byId('teamLog'), 'Missing base URL / ID / name', false);
-      const r = await call('PUT', team, `/api/teams/${id}`, { name }); setLog(byId('teamLog'), r.data, r.ok);
-    };
-    byId('btnTeamDelete').onclick = async () => {
-      const { team } = bases(); const id = byId('teamId').value.trim();
-      if (!team || !id) return setLog(byId('teamLog'), 'Missing base URL or ID', false);
-      const r = await call('DELETE', team, `/api/teams/${id}`); setLog(byId('teamLog'), r.data, r.ok);
-    };
+    // -------- Team --------
+    document.getElementById("create-team-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const { team } = bases();
+      const name = document.getElementById("team-name").value.trim();
+      if (!team || !name) return alert('Set Team base URL and team name.');
+      const r = await call("POST", team, "/api/teams", { name }); show("team-results", r.data);
+    });
+    document.getElementById("btnTeamsList").addEventListener("click", async () => {
+      const { team } = bases(); if (!team) return alert('Set Team base URL.');
+      const r = await call("GET", team, "/api/teams"); show("team-results", r.data);
+    });
+    document.getElementById("btnTeamsGraph").addEventListener("click", async () => {
+      const { team } = bases(); if (!team) return alert('Set Team base URL.');
+      const r = await call("GET", team, "/api/graph"); show("team-results", r.data);
+    });
+    document.getElementById("btnTeamGet").addEventListener("click", async () => {
+      const { team } = bases(); const id = document.getElementById("team-id").value.trim();
+      if (!team || !id) return alert('Set Team base URL and Team ID.');
+      const r = await call("GET", team, `/api/teams/${id}`); show("team-results", r.data);
+    });
+    document.getElementById("btnTeamUpdate").addEventListener("click", async () => {
+      const { team } = bases(); const id = document.getElementById("team-id").value.trim();
+      const name = document.getElementById("team-name-update").value.trim();
+      if (!team || !id || !name) return alert('Set Team base URL, ID, and new name.');
+      const r = await call("PUT", team, `/api/teams/${id}`, { name }); show("team-results", r.data);
+    });
+    document.getElementById("btnTeamDelete").addEventListener("click", async () => {
+      const { team } = bases(); const id = document.getElementById("team-id").value.trim();
+      if (!team || !id) return alert('Set Team base URL and Team ID.');
+      const r = await call("DELETE", team, `/api/teams/${id}`); show("team-results", r.data);
+    });
 
-    // ---------- Players ----------
-    byId('btnPlayersList').onclick = async () => {
-      const { player } = bases(); if (!player) return setLog(byId('playerLog'), 'Missing Player base URL', false);
-      const r = await call('GET', player, '/api/players'); setLog(byId('playerLog'), r.data, r.ok);
-    };
-    byId('btnPlayersGraph').onclick = async () => {
-      const { player } = bases(); if (!player) return setLog(byId('playerLog'), 'Missing Player base URL', false);
-      const r = await call('GET', player, '/api/graph'); setLog(byId('playerLog'), r.data, r.ok);
-    };
-    byId('btnPlayerGet').onclick = async () => {
-      const { player } = bases(); const id = byId('playerId').value.trim();
-      if (!player || !id) return setLog(byId('playerLog'), 'Missing Player base URL or ID', false);
-      const r = await call('GET', player, `/api/players/${id}`); setLog(byId('playerLog'), r.data, r.ok);
-    };
-    byId('btnDraft').onclick = async () => {
-      const { player } = bases(); const pid = byId('playerIdDraft').value.trim(); const tid = byId('teamIdDraft').value.trim();
+    // -------- Players --------
+    document.getElementById("btnPlayersList").addEventListener("click", async () => {
+      const { player } = bases(); if (!player) return alert('Set Player base URL.');
+      const r = await call("GET", player, "/api/players"); show("player-results", r.data);
+    });
+    document.getElementById("btnPlayersGraph").addEventListener("click", async () => {
+      const { player } = bases(); if (!player) return alert('Set Player base URL.');
+      const r = await call("GET", player, "/api/graph"); show("player-results", r.data);
+    });
+    document.getElementById("btnPlayerGet").addEventListener("click", async () => {
+      const { player } = bases(); const id = document.getElementById("player-id").value.trim();
+      if (!player || !id) return alert('Set Player base URL and Player ID.');
+      const r = await call("GET", player, `/api/players/${id}`); show("player-results", r.data);
+    });
+    document.getElementById("btnDraft").addEventListener("click", async () => {
+      const { player } = bases(); const pid = document.getElementById("player-id-draft").value.trim();
+      const tid = document.getElementById("team-id-draft").value.trim();
+      if (!player || !pid || !tid) return alert('Set Player base URL, Player ID, and Team ID.');
+      const r = await call("POST", player, "/api/players/draft", { playerId: pid, teamId: tid }); show("player-results", r.data);
+    });
+    document.getElementById("btnRelease").addEventListener("click", async () => {
+      const { player } = bases(); const pid = document.getElementById("player-id-draft").value.trim();
+      if (!player || !pid) return alert('Set Player base URL and Player ID.');
+      const r = await call("POST", player, "/api/players/release", { playerId: pid }); show("player-results", r.data);
+    });
+
+    // -------- Performance --------
+    document.getElementById("btnPerfList").addEventListener("click", async () => {
+      const { perf } = bases(); if (!perf) return alert('Set Performance base URL.');
+      const r = await call("GET", perf, "/api/performance"); show("competition-results", r.data);
+    });
+    document.getElementById("btnPerfGet").addEventListener("click", async () => {
+      const { perf } = bases(); const pid = document.getElementById("perf-player-id").value.trim();
+      if (!perf || !pid) return alert('Set Performance base URL and Player ID.');
+      const r = await call("GET", perf, `/api/performance/${pid}`); show("competition-results", r.data);
+    });
+    document.getElementById("btnPerfSimulate").addEventListener("click", async () => {
+      const { perf } = bases(); const name = document.getElementById("comp-name").value.trim();
+      if (!perf || !name) return alert('Set Performance base URL and competition name.');
+      const r = await call("POST", perf, "/api/performance/simulate", { name }); show("competition-results", r.data);
+    });
+
+    // -------- Leaderboard (optional) --------
+    document.getElementById("view-leaderboard").addEventListener("click", async () => {
+      const { lb } = bases(); if (!lb) return alert('Set Leaderboard base URL.');
+      const r = await call("GET", lb, "/api/leaderboard"); show("leaderboard-results", r.data);
+    });
+
+    // init
+    loadCfg();
+  </script>
+</body>
+</html>
