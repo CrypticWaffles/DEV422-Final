@@ -1,5 +1,10 @@
 
-**Note on next Meeting:** TEAMS MEETING 2 - SUNDAY DEC 7 - 4 PM.
+**Note on next Meeting:**  DEC 9    Meeting  4PM
+ 
+DEC 8 I am Providing the Azure SQL Configuration (Host the database in Azure SQL Database. Secure access using connection strings stored in Azure App Service settings)
+ 
+
+TEAMS MEETING 2 - SUNDAY DEC 7 - 4 PM.
 
 # DEV 422 Final Project - Fantasy Sports Team Management System
 
