@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fantasy Sports Team Management System</title>
+  <style>
+    :root {
+      --bg: #0f172a; /* slate-900 */
+      --card: #111827; /* gray-900 */
+      --accent: #22d3ee; /* cyan-400 */
+      --accent-2: #60a5fa; /* blue-400 */
+      --text: #e5e7eb; /* gray-200 */
+      --muted: #94a3b8; /* slate-400 */
+      --danger: #ef4444; /* red-500 */
+      --success: #10b981; /* emerald-500 */
+    }
+    html, body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    a { color: var(--accent); }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+    header h1 { font-size: 1.6rem; margin: 0; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+    .card { background: var(--card); border: 1px solid #1f2937; border-radius: 12px; padding: 16px; }
+    .card h2 { margin-top: 0; font-size: 1.2rem; }
+    .field { display: grid; gap: 6px; margin-bottom: 10px; }
+    .field label { color: var(--muted); font-size: 0.9rem; }
+    input, select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0b1220; color: var(--text); }
+    button { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border: none; color: #001427; font-weight: 700; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+    button.secondary { background: #1f2937; color: var(--text); border: 1px solid #334155; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .log { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.9rem; background: #0b1220; border: 1px solid #334155; border-radius: 8px; padding: 10px; height: 160px; overflow: auto; }
+    .ok { color: var(--success); }
+    .err { color: var(--danger); }
+    .muted { color: var(--muted); }
+    .kbd { font-family: ui-monospace, monospace; background: #0b1220; border: 1px solid #334155; padding: 2px 6px; border-radius: 6px; }
+    .small { font-size: 0.9rem; }
+    footer { margin-top: 28px; color: var(--muted); font-size: 0.9rem; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #334155; background: #0b1220; border-radius: 999px; padding: 6px 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Fantasy Sports Team Management System</h1>
+      <div class="pill">
+        <span class="muted">Environment</span>
+        <select id="envSelect" title="Environment">
+          <option value="dev">dev</option>
+          <option value="test">test</option>
+          <option value="prod">prod</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>Service Endpoints</h2>
+      <p class="muted small">Set your deployed Azure App Service URLs for each microservice. The UI will call the documented REST APIs.</p>
+      <div class="grid">
+        <div>
+          <div class="field"><label for="teamBase">Team Management Base URL</label><input id="teamBase" placeholder="https://team-svc.azurewebsites.net" /></div>
+          <div class="field"><label for="playerBase">Player Management Base URL</label><input id="playerBase" placeholder="https://player-svc.azurewebsites.net" /></div>
+        </div>
+        <div>
+          <div class="field"><label for="perfBase">Performance Tracking Base URL</label><input id="perfBase" placeholder="https://perf-svc.azurewebsites.net" /></div>
+          <div class="field"><label for="lbBase">Leaderboard Base URL (optional)</label><input id="lbBase" placeholder="https://leaderboard-svc.azurewebsites.net" /></div>
+        </div>
+      </div>
+      <div class="row"><button id="saveCfg">Save Config</button><button class="secondary" id="resetCfg">Reset</button></div>
+      <p class="muted small">Saved in <span class="kbd">localStorage</span>. This page is static and has no backend.</p>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Team Management</h2>
+        <div class="field"><label for="teamName">Team Name</label><input id="teamName" placeholder="e.g., Skyhawks" /></div>
+        <div class="row">
+          <button id="btnCreateTeam">Create Team</button>
+          <button class="secondary" id="btnListTeams">List Teams</button>
+        </div>
+        <hr />
+        <div class="field"><label for="teamId">Team ID</label><input id="teamId" placeholder="Team GUID/ID" /></div>
+        <div class="row">
+          <button id="btnGetTeam">Get Team</button>
+          <button class="secondary" id="btnRoster">Get Roster</button>
+        </div>
+        <div id="teamLog" class="log" aria-live="polite"></div>
+      </div>
+
+      <div class="card">
+        <h2>Player Management</h2>
+        <div class="field"><label for="playerName">Player Name</label><input id="playerName" placeholder="e.g., A. Johnson" /></div>
+        <div class="row">
+          <button id="btnAddPlayer">Add Player</button>
+          <button class="secondary" id="btnListPlayers">List Players</button>
+        </div>
+        <hr />
+        <div class="grid">
+          <div class="field"><label for="draftPlayerId">Player ID</label><input id="draftPlayerId" placeholder="Player GUID/ID" /></div>
+          <div class="field"><label for="draftTeamId">Team ID</label><input id="draftTeamId" placeholder="Team GUID/ID" /></div>
+        </div>
+        <div class="row">
+          <button id="btnDraft">Draft Player to Team</button>
+          <button class="secondary" id="btnRelease">Release Player</button>
+        </div>
+        <div id="playerLog" class="log"></div>
+      </div>
+
+      <div class="card">
+        <h2>Performance Tracking</h2>
+        <div class="field"><label for="compName">Competition Name</label><input id="compName" placeholder="e.g., Week 1" /></div>
+        <div class="row">
+          <button id="btnSimulate">Simulate Competition</button>
+          <button class="secondary" id="btnStats">Get Player Stats</button>
+        </div>
+        <div id="perfLog" class="log"></div>
+      </div>
+
+      <div class="card">
+        <h2>Leaderboard (Optional)</h2>
+        <div class="row">
+          <button id="btnRank">Get Leaderboard</button>
+          <button class="secondary" id="btnLBHelp">Docs</button>
+        </div>
+        <div id="lbLog" class="log"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>API Contracts (Example)</h2>
+      <p class="muted small">Adjust these paths to match your actual service implementations. This UI assumes conventional REST endpoints and JSON.
+      </p>
+      <ul>
+        <li><b>Team Management</b>
+          <ul class="muted">
+            <li>POST <span class="kbd">/api/teams</span> → { name }</li>
+            <li>GET <span class="kbd">/api/teams</span></li>
+            <li>GET <span class="kbd">/api/teams/{teamId}</span></li>
+            <li>GET <span class="kbd">/api/teams/{teamId}/roster</span> (calls Player service)</li>
+          </ul>
+        </li>
+        <li><b>Player Management</b>
+          <ul class="muted">
+            <li>POST <span class="kbd">/api/players</span> → { name }</li>
+            <li>GET <span class="kbd">/api/players</span></li>
+            <li>POST <span class="kbd">/api/players/{playerId}/draft</span> → { teamId }</li>
+            <li>POST <span class="kbd">/api/players/{playerId}/release</span></li>
+          </ul>
+        </li>
+        <li><b>Performance Tracking</b>
+          <ul class="muted">
+            <li>POST <span class="kbd">/api/competitions</span> → { name }</li>
+            <li>GET <span class="kbd">/api/stats</span></li>
+          </ul>
+        </li>
+        <li><b>Leaderboard</b>
+          <ul class="muted">
+            <li>GET <span class="kbd">/api/leaderboard</span></li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>Tip: Use Azure App Service app settings to store connection strings and downstream service URLs. Protect APIs with AAD, API keys, or JWT.</p>
+    </footer>
+  </div>
+
+  <script>
+    // ---------- Minimal config handling ----------
+    const cfgKey = 'fantasy-sports-config-v1';
+    const byId = (id) => document.getElementById(id);
+
+    function readCfg() {
+      try { return JSON.parse(localStorage.getItem(cfgKey)) || {}; } catch { return {}; }
+    }
+    function writeCfg(cfg) { localStorage.setItem(cfgKey, JSON.stringify(cfg)); }
+
+    function loadCfg() {
+      const cfg = readCfg();
+      byId('envSelect').value = cfg.env || 'dev';
+      byId('teamBase').value = cfg.teamBase || '';
+      byId('playerBase').value = cfg.playerBase || '';
+      byId('perfBase').value = cfg.perfBase || '';
+      byId('lbBase').value = cfg.lbBase || '';
+    }
+    function saveCfg() {
+      const cfg = {
+        env: byId('envSelect').value,
+        teamBase: byId('teamBase').value.trim(),
+        playerBase: byId('playerBase').value.trim(),
+        perfBase: byId('perfBase').value.trim(),
+        lbBase: byId('lbBase').value.trim(),
+      };
+      writeCfg(cfg);
+      toast('Config saved', 'ok');
+    }
+    function resetCfg() { localStorage.removeItem(cfgKey); loadCfg(); toast('Config reset', 'ok'); }
+
+    byId('saveCfg').onclick = saveCfg;
+    byId('resetCfg').onclick = resetCfg;
+
+    // ---------- Fetch helpers ----------
+    function toast(msg, cls='muted') {
+      console.log(msg);
+      const div = document.createElement('div');
+      div.className = cls;
+      div.textContent = msg;
+      [byId('teamLog'), byId('playerLog'), byId('perfLog'), byId('lbLog')].forEach(l => l && l.appendChild(div.cloneNode(true)));
+    }
+    function setLog(el, data, ok=true) {
+      const pre = document.createElement('pre');
+      pre.className = ok ? 'ok' : 'err';
+      try { pre.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2); }
+      catch { pre.textContent = String(data); }
+      el.prepend(pre);
+    }
+
+    async function call(method, base, path, body) {
+      const url = `${base}${path}`;
+      const headers = { 'Content-Type': 'application/json' };
+      // If you protect APIs, inject Authorization here
+      const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined });
+      const text = await res.text();
+      let data = text;
+      try { data = JSON.parse(text); } catch {}
+      return { ok: res.ok, status: res.status, data };
+    }
+
+    function bases() {
+      const cfg = readCfg();
+      return { team: cfg.teamBase, player: cfg.playerBase, perf: cfg.perfBase, lb: cfg.lbBase };
+    }
+
+    // ---------- Team Management UI ----------
+    byId('btnCreateTeam').onclick = async () => {
+      const { team } = bases();
+      const name = byId('teamName').value.trim();
+      if (!team || !name) return setLog(byId('teamLog'), 'Missing team base URL or team name', false);
+      const r = await call('POST', team, '/api/teams', { name });
+      setLog(byId('teamLog'), r.data, r.ok);
+    };
+    byId('btnListTeams').onclick = async () => {
+      const { team } = bases();
+      if (!team) return setLog(byId('teamLog'), 'Missing team base URL', false);
+      const r = await call('GET', team, '/api/teams');
+      setLog(byId('teamLog'), r.data, r.ok);
+    };
+    byId('btnGetTeam').onclick = async () => {
+      const { team } = bases();
+      const id = byId('teamId').value.trim();
+      if (!team || !id) return setLog(byId('teamLog'), 'Missing team base URL or team ID', false);
+      const r = await call('GET', team, `/api/teams/${id}`);
+      setLog(byId('teamLog'), r.data, r.ok);
+    };
+    byId('btnRoster').onclick = async () => {
+      const { team } = bases();
+      const id = byId('teamId').value.trim();
+      if (!team || !id) return setLog(byId('teamLog'), 'Missing team base URL or team ID', false);
+      const r = await call('GET', team, `/api/teams/${id}/roster`);
+      setLog(byId('teamLog'), r.data, r.ok);
+    };
+
+    // ---------- Player Management UI ----------
+    byId('btnAddPlayer').onclick = async () => {
+      const { player } = bases();
+      const name = byId('playerName').value.trim();
+      if (!player || !name) return setLog(byId('playerLog'), 'Missing player base URL or name', false);
+      const r = await call('POST', player, '/api/players', { name });
+      setLog(byId('playerLog'), r.data, r.ok);
+    };
+    byId('btnListPlayers').onclick = async () => {
+      const { player } = bases();
+      if (!player) return setLog(byId('playerLog'), 'Missing player base URL', false);
+      const r = await call('GET', player, '/api/players');
+      setLog(byId('playerLog'), r.data, r.ok);
+    };
+    byId('btnDraft').onclick = async () => {
+      const { player } = bases();
+      const pid = byId('draftPlayerId').value.trim();
+      const tid = byId('draftTeamId').value.trim();
+      if (!player || !pid || !tid) return setLog(byId('playerLog'), 'Missing player base URL, player ID, or team ID', false);
+      const r = await call('POST', player, `/api/players/${pid}/draft`, { teamId: tid });
+      setLog(byId('playerLog'), r.data, r.ok);
+    };
+    byId('btnRelease').onclick = async () => {
+      const { player } = bases();
+      const pid = byId('draftPlayerId').value.trim();
+      if (!player || !pid) return setLog(byId('playerLog'), 'Missing player base URL or player ID', false);
+      const r = await call('POST', player, `/api/players/${pid}/release`);
+      setLog(byId('playerLog'), r.data, r.ok);
+    };
+
+    // ---------- Performance Tracking UI ----------
+    byId('btnSimulate').onclick = async () => {
+      const { perf } = bases();
+      const name = byId('compName').value.trim();
+      if (!perf || !name) return setLog(byId('perfLog'), 'Missing performance base URL or competition name', false);
+      const r = await call('POST', perf, '/api/competitions', { name });
+      setLog(byId('perfLog'), r.data, r.ok);
+    };
+    byId('btnStats').onclick = async () => {
+      const { perf } = bases();
+      if (!perf) return setLog(byId('perfLog'), 'Missing performance base URL', false);
+      const r = await call('GET', perf, '/api/stats');
+      setLog(byId('perfLog'), r.data, r.ok);
+    };
+
+    // ---------- Leaderboard UI ----------
+    byId('btnRank').onclick = async () => {
+      const { lb } = bases();
+      if (!lb) return setLog(byId('lbLog'), 'Missing leaderboard base URL', false);
+      const r = await call('GET', lb, '/api/leaderboard');
+      setLog(byId('lbLog'), r.data, r.ok);
+    };
+    byId('btnLBHelp').onclick = () => {
+      setLog(byId('lbLog'), 'Leaderboard Service is optional. Implement GET /api/leaderboard to aggregate team performance from PerformanceStats.', true);
+    };
+
+    // initialize
+    loadCfg();
+  </script>
+</body>
+</html>
