@@ -145,8 +145,7 @@
 
 > At runtime, App Service exposes this connection string to your app configuration and as environment variables (e.g., `conn`). Reading it via `Configuration.GetConnectionString("<Name>")` is the usual approach in ASP.NET Core.
 
-### Use in code
-```C#
+### Use in C\# code
 // Program.cs
 var conn = builder.Configuration.GetConnectionString("conn");
 builder.Services.AddDbContext<PerformanceContext>(opt => opt.UseSqlServer(conn));
