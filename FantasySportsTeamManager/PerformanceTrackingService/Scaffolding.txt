@@ -1,0 +1,19 @@
+PerformanceTrackingService/
+├─ PerformanceTrackingService.csproj
+├─ Program.cs
+├─ appsettings.json
+├─ appsettings.Development.json
+├─ Controllers/
+│  └─ PerformanceController.cs
+├─ Data/
+│  └─ PerformanceContext.cs
+├─ Models/
+│  ├─ PerformanceStat.cs
+│  └─ PlayerDto.cs
+├─ Services/
+│  ├─ PlayerClient.cs
+│  └─ StatsGenerator.cs
+└─ Tests/
+   └─ PerformanceTrackingService.Tests.csproj
+   └─ ControllersTests.cs
+   └─ StatsGeneratorTests.cs
