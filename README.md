@@ -129,18 +129,13 @@ TrustServerCertificate=False;
 Connection Timeout=30;
 
 - Database Name: DEV422FantasySportsDB
-- Server Name: fantasysports-sqlsrv.database.windows.net
+- Server Full Name: fantasysports-sqlsrv.database.windows.net
+- Server Name: fantasysports-sqlsrv
 - Status: Online 
 - Subscription: Azure for Students 
 - Region: West US 2 
-
-
-## Azure SQL Database (DEV422FantasySportsDB)
-
-**Server**: fantasysports-sqlsrv (West US 2)  
-**DB**: DEV422FantasySportsDB  
-**Auth**: Microsoft Entra (server admin set) or SQL auth (admin user)  
-**Firewall**: Client IP allowed; Azure services access enabled for App Services.
+- Auth: Microsoft Entra (server admin set) or SQL auth (admin user)
+- Firewall: Client IP allowed; Azure services access enabled for App Services.
 
 ### Tables (camelCase)
 - dbo.Teams(teamId UNIQUEIDENTIFIER PK, teamName NVARCHAR(100), createdDate DATETIME2)
@@ -148,14 +143,14 @@ Connection Timeout=30;
 - dbo.PerformanceStats(statId UNIQUEIDENTIFIER PK, playerId UNIQUEIDENTIFIER FK → Players, points INT, assists INT, rebounds INT, gameDate DATETIME2, competitionName NVARCHAR(100))
 
 ### Connection string (App Service)
-Name: `PerformanceDb`, Type: SQLAzure  
-Read in code: `Configuration.GetConnectionString("PerformanceDb")`
+- Name: `PerformanceDb`, Type: SQLAzure  
+- Read in code: `Configuration.GetConnectionString("PerformanceDb")`
 
 
--- Optional: create schemas (default is dbo)
--- CREATE SCHEMA Team AUTHORIZATION dbo;
--- CREATE SCHEMA Player AUTHORIZATION dbo;
--- CREATE SCHEMA Perf AUTHORIZATION dbo;
+- Optional: create schemas (default is dbo)
+- CREATE SCHEMA Team AUTHORIZATION dbo;
+- CREATE SCHEMA Player AUTHORIZATION dbo;
+- CREATE SCHEMA Perf AUTHORIZATION dbo;
 
 --------------------------------------------
 -- Teams (owned by Team Management Service)
