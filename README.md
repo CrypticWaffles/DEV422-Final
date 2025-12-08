@@ -8,8 +8,8 @@
 **Date:** Dec 7 4 PM – 4:15 PM  
 **Team Members:** Miles Griffith, Peter Troendle, Sean Miles
 
-1. Team project pushed
-2. Player Project
+1. Team project pushed TeamManagement     **should (TASK FOR SEAN)** be >>>>>>>>>TeamManagementService
+2. Player Project pushed PlayerManagementService
 3. Integration top
 4. Performance is now using the data 1. and 2. provide (Integration and Statistics) 
 - DEC 8 I am Providing the Azure SQL Secure access using connection strings stored in Azure App Service settings
