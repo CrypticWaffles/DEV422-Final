@@ -118,7 +118,8 @@
 
 **Note on Form:** All tables use CamelCase for columns and PascalCase for table names. All fonts use Sans Serif 12.
 
-// GIT - HOW TO ADD CHANGES ON LOCAL COPY TO THE GITHUB TEAMS WORK
+---
+** GIT - HOW TO ADD CHANGES ON LOCAL COPY TO THE GITHUB TEAMS WORK **
 
   - 927  git clone https://github.com/CrypticWaffles/DEV422-Final.git
   - 933  cd DEV422-Final\
