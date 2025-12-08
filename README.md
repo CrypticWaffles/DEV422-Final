@@ -10,7 +10,8 @@
 
 1. Team project pushed
 2. Player Project
-3. Performance is now using the data 1. and 2. provide (Integration and Statistics) 
+3. Integration top
+4. Performance is now using the data 1. and 2. provide (Integration and Statistics) 
 - DEC 8 I am Providing the Azure SQL Secure access using connection strings stored in Azure App Service settings
   
  
