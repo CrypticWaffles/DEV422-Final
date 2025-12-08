@@ -115,6 +115,24 @@
 - `gameDate`
 
 ---
+#### Azure SQL Database Deployment
+- Method: .NET/C# project with REST services and Azure SQL tables (Teams, Players, PerformanceStats)
+- Connection Strings: ADO.NET (SQL authentication)
+- Server=tcp:fantasysports-sqlsrv.database.windows.net,1433;
+Initial Catalog=DEV422FantasySportsDB;
+Persist Security Info=False;
+User ID=sqladmin;
+Password=SQLadmin2015;
+MultipleActiveResultSets=False;
+Encrypt=True;
+TrustServerCertificate=False;
+Connection Timeout=30;
+
+- Database Name: DEV422FantasySportsDB
+- Server Name: fantasysports-sqlsrv.database.windows.net
+- Status: Online 
+- Subscription: Azure for Students 
+- Region: West US 2 
 
 **Note on Form:** All tables use CamelCase for columns and PascalCase for table names. All fonts use Sans Serif 12.
 
@@ -129,4 +147,5 @@
   - 937  git push origin HEAD
   - 938  git commit -m "Update README (point 4)"
   - 939  git push origin main
+
     
