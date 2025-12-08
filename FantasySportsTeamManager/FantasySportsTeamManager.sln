@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36717.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FantasySportsTeamManager", "FantasySportsTeamManager\FantasySportsTeamManager.csproj", "{E52D4594-1E80-4C52-B70B-41547755B5D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamManagement", "TeamManagement\TeamManagement.csproj", "{0A012299-E163-41FA-BCD9-AC4BF79FAF70}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamManagementService", "TeamManagementService\TeamManagementService.csproj", "{0A012299-E163-41FA-BCD9-AC4BF79FAF70}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayerManagementService", "PlayerManagementService\PlayerManagementService.csproj", "{34CCF68B-2DCD-484A-909F-DB48FF23C302}"
 EndProject

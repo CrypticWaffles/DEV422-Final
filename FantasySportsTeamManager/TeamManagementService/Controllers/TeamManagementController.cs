@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PlayerManagementService;
-using TeamManagement.Model;
+using TeamManagementService.Model;
 using PlayerManagementService.Controllers;
-using TeamManagement.Data;
+using TeamManagementService.Data;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-namespace TeamManagement.Controllers
+namespace TeamManagementService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

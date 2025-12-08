@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-namespace TeamManagement.Model
+namespace TeamManagementService.Model
 {
     public class Team
     {

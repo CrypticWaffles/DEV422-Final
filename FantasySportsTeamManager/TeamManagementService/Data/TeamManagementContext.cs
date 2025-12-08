@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TeamManagement.Model;
-namespace TeamManagement.Data
+using TeamManagementService.Model;
+namespace TeamManagementService.Data
 {
     public class TeamManagementContext : DbContext
     {
