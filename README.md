@@ -125,28 +125,28 @@
 **Auth**: Microsoft Entra (server admin set) or SQL auth (admin user)  
 **Firewall**: Client IP allowed; Azure services access enabled for App Services.
 
-### Add connection string in Azure Portal
-1. Go to **App Service → Settings → Environment variables → Connection strings**.
-2. Click **+ Add** and use:
+### Added connection string in Azure Portal
+1. In **App Service → Settings → Environment variables → Connection strings**.
+2. **+ Add**:
    - **Name**: `conn`
    - **Type**: `SQLAzure`
-   - **Value** (example — do **not** commit credentials to source):
+   - **Value** (Passwords and Username are private and dont belong in Github as its public):
      ```
      Server=tcp:fantasysports-sqlsrv.database.windows.net,1433;
      Initial Catalog=DEV422FantasySportsDB;
      Persist Security Info=False;
-     User ID=<your-sql-user>;
-     Password=<your-strong-password>;
+     User ID=<your-sql-user>;  <<<<<<<< Private& Confidential
+     Password=<your-strong-password>;   <<<<<<< Private & Confidential
      MultipleActiveResultSets=False;
      Encrypt=True;
      TrustServerCertificate=False;
      Connection Timeout=30;
      ```
 
-> At runtime, App Service exposes this connection string to your app configuration and as environment variables (e.g., `SQLAZURECONNSTR_conn`). Reading it via `Configuration.GetConnectionString("<Name>")` is the recommended approach in ASP.NET Core.
+> At runtime, App Service exposes this connection string to your app configuration and as environment variables (e.g., `conn`). Reading it via `Configuration.GetConnectionString("<Name>")` is the usual approach in ASP.NET Core.
 
 ### Use in code
-```csharp
+```C#
 // Program.cs
 var conn = builder.Configuration.GetConnectionString("conn");
 builder.Services.AddDbContext<PerformanceContext>(opt => opt.UseSqlServer(conn));
