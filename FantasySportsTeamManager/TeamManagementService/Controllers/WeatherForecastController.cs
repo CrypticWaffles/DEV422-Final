@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace TeamManagement.Controllers
+namespace TeamManagementService.Controllers
 {
     [ApiController]
     [Route("[controller]")]

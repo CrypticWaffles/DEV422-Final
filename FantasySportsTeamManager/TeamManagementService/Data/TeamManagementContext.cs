@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TeamManagement.Model;
-namespace TeamManagement.Data
+using TeamManagementService.Model;
+namespace TeamManagementService.Data
 {
-    public class TeamManagementContext : DbContext
+    public class TeamManagementServiceContext : DbContext
     {
-        public TeamManagementContext(DbContextOptions<TeamManagementContext> options) :base(options)
+        public TeamManagementServiceContext(DbContextOptions<TeamManagementServiceContext> options) :base(options)
         {
 
         }
