@@ -1,10 +1,10 @@
 
-**Note on next Meeting:**  DEC 9    Meeting  4PM
+**Note on next Meeting:**  DEC 9    Meeting  4PM  Making the 5 min Video
  
 # DEV 422 Final Project - Fantasy Sports Team Management System
 
 
-## Meeting Notes - Second Team Meeting
+## Meeting Minutes - Second Team Meeting
 **Date:** Dec 7 4 PM – 4:15 PM  
 **Team Members:** Miles Griffith, Peter Troendle, Sean Miles
 
@@ -16,7 +16,7 @@
  
 
 
-## Meeting Notes - First Team Meeting
+## Meeting Minutes - First Team Meeting
 **Date:** 4:45 PM – 3:15 PM  
 **Team Members:** Miles Griffith, Peter Troendle, Sean Miles
 
