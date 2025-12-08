@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamManagement", "TeamManag
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayerManagementService", "PlayerManagementService\PlayerManagementService.csproj", "{34CCF68B-2DCD-484A-909F-DB48FF23C302}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTrackingService", "PerformanceTrackingService\PerformanceTrackingService.csproj", "{D094429D-C48B-334F-FCF1-D5E81E31C158}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTrackingService.Tests", "PerformanceTrackingService.Tests\PerformanceTrackingService.Tests.csproj", "{5D930A14-6703-4B79-8489-3A2E50E62AF7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{34CCF68B-2DCD-484A-909F-DB48FF23C302}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34CCF68B-2DCD-484A-909F-DB48FF23C302}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34CCF68B-2DCD-484A-909F-DB48FF23C302}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D094429D-C48B-334F-FCF1-D5E81E31C158}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D094429D-C48B-334F-FCF1-D5E81E31C158}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D094429D-C48B-334F-FCF1-D5E81E31C158}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D094429D-C48B-334F-FCF1-D5E81E31C158}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D930A14-6703-4B79-8489-3A2E50E62AF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D930A14-6703-4B79-8489-3A2E50E62AF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D930A14-6703-4B79-8489-3A2E50E62AF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D930A14-6703-4B79-8489-3A2E50E62AF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
