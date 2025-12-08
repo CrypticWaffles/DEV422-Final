@@ -1,24 +1,36 @@
 
-**Note on next Meeting:**  DEC 9    Meeting  4PM  Making the 5 min Video
- 
+**Note on next Meeting:** DEC 9 – Meeting 4 PM – Making the 5 min Video
+
 # DEV 422 Final Project - Fantasy Sports Team Management System
 
+---
+**git when in a Team**
+
+# Clone repo
+git clone https://github.com/CrypticWaffles/DEV422-Final.git
+cd DEV422-Final/
+
+# Add changes
+git add .
+git commit -m "Update README with Azure connection string instructions"
+git pull --rebase origin main   # resolve conflicts if any
+git push origin main
+---
 
 ## Meeting Minutes - Second Team Meeting
-**Date:** Dec 7 4 PM – 4:15 PM  
+**Date:** Dec 7, 4:00 PM – 4:15 PM  
 **Team Members:** Miles Griffith, Peter Troendle, Sean Miles
 
-1. Team project pushed TeamManagement     **should (TASK FOR SEAN)** be >>>>>>>>>TeamManagementService
+1. Team project pushed TeamManagement **should (TASK FOR SEAN)** be >>>>>>> TeamManagementService
 2. Player Project pushed PlayerManagementService
 3. Integration top
-4. Performance is now using the data 1. and 2. provide (Integration and Statistics) 
-- DEC 8 I am Providing the Azure SQL Secure access using connection strings stored in Azure App Service settings
-  
- 
+4. Performance is now using the data 1 and 2 provide (Integration and Statistics)
+- DEC 8: Providing Azure SQL secure access using connection strings stored in Azure App Service settings
 
+---
 
 ## Meeting Minutes - First Team Meeting
-**Date:** 4:45 PM – 3:15 PM  
+**Date:** Dec 4, 4:45 PM – 5:15 PM  
 **Team Members:** Miles Griffith, Peter Troendle, Sean Miles
 
 ---
@@ -113,57 +125,40 @@
 - `assists`
 - `rebounds`
 - `gameDate`
+- `competitionName`
 
 ---
-#### Azure SQL Database Deployment
-- Method: .NET/C# project with REST services and Azure SQL tables (Teams, Players, PerformanceStats)
-- Connection Strings: ADO.NET (SQL authentication)
-- Server=tcp:fantasysports-sqlsrv.database.windows.net,1433;
-Initial Catalog=DEV422FantasySportsDB;
-Persist Security Info=False;
-User ID=sqladmin;
-Password=SQLadmin2015;
-MultipleActiveResultSets=False;
-Encrypt=True;
-TrustServerCertificate=False;
-Connection Timeout=30;
 
-- Database Name: DEV422FantasySportsDB
-- Server Full Name: fantasysports-sqlsrv.database.windows.net
-- Server Name: fantasysports-sqlsrv
-- Status: Online 
-- Subscription: Azure for Students 
-- Region: West US 2 
-- Auth: Microsoft Entra (server admin set) or SQL auth (admin user)
-- Firewall: Client IP allowed; Azure services access enabled for App Services.
+## Azure SQL Database & Connection String (App Service)
 
-### Tables (camelCase)
-- dbo.Teams(teamId UNIQUEIDENTIFIER PK, teamName NVARCHAR(100), createdDate DATETIME2)
-- dbo.Players(playerId UNIQUEIDENTIFIER PK, playerName NVARCHAR(100), position NVARCHAR(50), teamId UNIQUEIDENTIFIER FK → Teams)
-- dbo.PerformanceStats(statId UNIQUEIDENTIFIER PK, playerId UNIQUEIDENTIFIER FK → Players, points INT, assists INT, rebounds INT, gameDate DATETIME2, competitionName NVARCHAR(100))
+**Server**: `fantasysports-sqlsrv.database.windows.net`  
+**Database**: `DEV422FantasySportsDB`  
+**Region**: West US 2  
+**Auth**: Microsoft Entra (server admin set) or SQL auth (admin user)  
+**Firewall**: Client IP allowed; Azure services access enabled for App Services.
 
-### Connection string (App Service)
-- Name: `PerformanceDb`, Type: SQLAzure  
-- Read in code: `Configuration.GetConnectionString("PerformanceDb")`
+### Add connection string in Azure Portal
+1. Go to **App Service → Settings → Environment variables → Connection strings**.
+2. Click **+ Add** and use:
+   - **Name**: `conn`
+   - **Type**: `SQLAzure`
+   - **Value** (example — do **not** commit credentials to source):
+     ```
+     Server=tcp:fantasysports-sqlsrv.database.windows.net,1433;
+     Initial Catalog=DEV422FantasySportsDB;
+     Persist Security Info=False;
+     User ID=<your-sql-user>;
+     Password=<your-strong-password>;
+     MultipleActiveResultSets=False;
+     Encrypt=True;
+     TrustServerCertificate=False;
+     Connection Timeout=30;
+     ```
 
+> At runtime, App Service exposes this connection string to your app configuration and as environment variables (e.g., `SQLAZURECONNSTR_conn`). Reading it via `Configuration.GetConnectionString("<Name>")` is the recommended approach in ASP.NET Core.
 
-- Optional: create schemas (default is dbo)
-- CREATE SCHEMA Team AUTHORIZATION dbo;
-- CREATE SCHEMA Player AUTHORIZATION dbo;
-- CREATE SCHEMA Perf AUTHORIZATION dbo;
-
-**Note on Form:** All tables use CamelCase for columns and PascalCase for table names. All fonts use Sans Serif 12.
-
----
-**GIT - HOW TO ADD CHANGES ON LOCAL COPY TO THE GITHUB TEAMS WORK**
-
-  - 927  git clone https://github.com/CrypticWaffles/DEV422-Final.git
-  - 933  cd DEV422-Final\
-  - 934  git remote -v
-  - 935  git add .
-  - 936  git status
-  - 937  git push origin HEAD
-  - 938  git commit -m "Update README (point 4)"
-  - 939  git push origin main
-
-    
+### Use in code
+```csharp
+// Program.cs
+var conn = builder.Configuration.GetConnectionString("conn");
+builder.Services.AddDbContext<PerformanceContext>(opt => opt.UseSqlServer(conn));
