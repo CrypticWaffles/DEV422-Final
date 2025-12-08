@@ -118,3 +118,14 @@
 
 **Note on Form:** All tables use CamelCase for columns and PascalCase for table names. All fonts use Sans Serif 12.
 
+// GIT - HOW TO ADD CHANGES ON LOCAL COPY TO THE GITHUB TEAMS WORK
+
+  - 927  git clone https://github.com/CrypticWaffles/DEV422-Final.git
+  - 933  cd DEV422-Final\
+  - 934  git remote -v
+  - 935  git add .
+  - 936  git status
+  - 937  git push origin HEAD
+  - 938  git commit -m "Update README (point 4)"
+  - 939  git push origin main
+    
