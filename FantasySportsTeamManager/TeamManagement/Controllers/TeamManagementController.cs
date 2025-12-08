@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
+using PlayerManagementService;
+using TeamManagement.Model;
+using PlayerManagementService.Controllers;
+using TeamManagement.Data;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 namespace TeamManagement.Controllers
 {
     [Route("api/[controller]")]
@@ -8,48 +13,52 @@ namespace TeamManagement.Controllers
     public class TeamManagementController : ControllerBase
     {
         private static readonly List<Team> _teams= new List<Team>();
-        [HttpGet("teams")]
-        public ActionResult<IEnumerable<Team>> ListAllTeams()
+        private readonly TeamManagementContext context;
+        public TeamManagementController(TeamManagementContext teamManagementContext)
         {
-            if (_teams == null || _teams.Count == 0)
-            {
-                return BadRequest("There are no teams to get. Create a team.");
-            }
+            context = teamManagementContext;
+        }
+        [HttpGet("teams")]
+        public async Task<IActionResult> ListAllTeams()//Task<ActionResult<IEnumerable<Team>>> ListAllTeams()
+        {
             return Ok(new
             {
                 Message = "Successfully listed all teams",
-                Data = _teams
+                Data = await context.Teams.ToListAsync()+"\n"+_teams
             });
         }
         [HttpGet("graph")]
         public IActionResult GetGraph()
         {
+            //PlayerController playerController = new PlayerController();
+            //playerController.ListAllPlayers();
             return Ok(new
             {
                 Message = "Successfully retrieved Graph",
-                Data = "WIP: GRAPH"
+                Data = "WIP: GRAPH"//playerController
             });
         }
         [HttpGet("teams/{id}")]
-        public ActionResult<Team> GetTeamById(int id)
+        public async Task<ActionResult> GetTeamById(int id)
         {
-            var team = _teams.FirstOrDefault(x => x.teamId == id);
-            if (_teams == null || _teams.Count == 0)
+            var team = await context.Teams.FirstOrDefaultAsync(x => x.teamId == id); 
+            var listteam = _teams.FirstOrDefault(x => x.teamId == id);
+            if (_teams == null || _teams.Count == 0 || context.Teams.Count() == 0)
             {
                 return BadRequest("There are no teams to get by id. Create a team.");
             }
-            if (team == null)
+            if (team == null || listteam == null)
             {
                 return NotFound("There is no team that has this id.");
             }
             return Ok(new
             {
                 Message = "Successfully got team by ID",
-                Data = team
+                Data = team+"\n"+listteam
             });
         }
         [HttpPost("teams")]
-        public IActionResult CreateNewTeam(Team team)
+        public async Task<IActionResult> CreateNewTeam(Team team)
         {
             if (team == null)
             {
@@ -58,6 +67,9 @@ namespace TeamManagement.Controllers
             team.createdDate = DateTime.Now;
             _teams.Add(team);
             team.teamId = _teams.Count;
+            await context.Teams.AddAsync(team);
+            team.teamId = context.Teams.Count();
+            context.SaveChanges();
             return Ok(new
             {
                 Message = "Successfully created new team",
@@ -65,10 +77,11 @@ namespace TeamManagement.Controllers
             });
         }
         [HttpPut("teams/{id}")]
-        public IActionResult UpdateTeamDetails(int id,Team team)
+        public async Task<IActionResult> UpdateTeamDetails(int id,Team team)
         {
-            var verifyteam = _teams.FirstOrDefault(x => x.teamId == id);
-            if (_teams == null || _teams.Count == 0)
+            var verifyteam = await context.Teams.FirstOrDefaultAsync(x => x.teamId == id);
+            var listteam = _teams.FirstOrDefault(x => x.teamId == id);
+            if (_teams == null || _teams.Count == 0 || context.Teams.Count() == 0)
             {
                 return BadRequest("There are no teams to update. Create a team.");
             }
@@ -76,11 +89,12 @@ namespace TeamManagement.Controllers
             {
                 return BadRequest("Team's fields are null");
             }
-            if (verifyteam == null)
+            if (verifyteam == null || listteam == null)
             {
                 return NotFound("There is no team that has this id.");
             }
             verifyteam.teamName=team.teamName;
+            context.SaveChanges();
             return Ok(new
             {
                 Message = "Successfully updated team details",
@@ -88,10 +102,10 @@ namespace TeamManagement.Controllers
             });
         }
         [HttpDelete("teams/{id}")]
-        public IActionResult DeleteTeam(int id)
+        public async Task<IActionResult> DeleteTeam(int id)
         {
-            var verifyteam = _teams.FirstOrDefault(x => x.teamId == id);
-            if (_teams == null || _teams.Count == 0)
+            var verifyteam = await context.Teams.FirstOrDefaultAsync(x => x.teamId == id);
+            if (_teams == null || _teams.Count == 0 || context.Teams.Count() == 0)
             {
                 return BadRequest("There are no teams to delete. Create a team.");
             }
@@ -99,7 +113,9 @@ namespace TeamManagement.Controllers
             {
                 return NotFound("There is no team that has this id.");
             }
-            _teams.RemoveAt(id-1);
+            _teams.RemoveAt(id - 1);
+            context.Teams.Remove(verifyteam);
+            context.SaveChanges();
             return Ok(new
             {
                 Message = "Successfully deleted team",
