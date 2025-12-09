@@ -1,4 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PlayerManagementService.Data;
+using PlayerManagementService.Model;
+using PlayerManagementService.Model.PlayerManagementService.Model;
 
 namespace PlayerManagementService.Controllers
 {
@@ -6,71 +10,131 @@ namespace PlayerManagementService.Controllers
     [ApiController]
     public class PlayerController : ControllerBase
     {
-        // In-memory list to store players
-        private static readonly List<Model.Player> _players = new List<Model.Player>();
+        // Database context
+        private readonly FantasySportsContext _context;
+
+        /// <summary>
+        /// Constructor for PlayerController
+        /// </summary>
+        /// <param name="context"></param>
+        public PlayerController(FantasySportsContext context)
+        {
+            _context = context;
+        }
 
         /// <summary>
         /// Method to create a new player
         /// </summary>
-        /// <param name="player"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult CreateNewPlayer([FromBody] Model.PlayerCreationRequest request)
+        public async Task<IActionResult> CreateNewPlayer([FromBody] PlayerCreationRequest request)
         {
-            // Validate fields
-            if (request == null || string.IsNullOrWhiteSpace(request.FirstName))
+            // Validate request
+            if (request == null || string.IsNullOrWhiteSpace(request.PlayerName))
             {
                 return BadRequest("Player data is incomplete.");
             }
 
-            // Generate ID
-            // If list is empty, start at 1. Otherwise, find the max ID and add 1.
-            int newId = _players.Any() ? _players.Max(p => p.Id) + 1 : 1;
-
-            // Use the Constructor to build new Player object
-            Model.Player newPlayer = new Model.Player(
-                newId,
-                request.FirstName,
-                request.LastName,
-                request.DateOfBirth
+            // Create new player instance
+            Player newPlayer = new Player(
+                request.PlayerName,
+                request.Position
             );
 
-            // Add to storage
-            _players.Add(newPlayer);
+            // Add new player to SQL Database
+            _context.Players.Add(newPlayer);
+            await _context.SaveChangesAsync();
 
-            return Ok(new
+            return Ok(new { Message = "Successfully created new player", Data = newPlayer });
+        }
+
+        /// <summary>
+        /// Method to list all players
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Player>>> ListAllPlayers()
+        {
+            // Retrieve all players from the SQL Database
+            var players = await _context.Players.ToListAsync();
+
+            // Validate if any players exist
+            if (players == null || !players.Any())
             {
-                Message = "Successfully created new player",
-                Data = newPlayer
-            });
+                return Ok(new List<Player>());
+            }
+            return Ok(new { Message = "Successfully listed all players", Data = players });
+        }
+
+        /// <summary>
+        /// Method to get a player by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Player>> GetPlayerById(int id)
+        {
+            // Find player in the SQL Database by ID
+            var player = await _context.Players.FindAsync(id);
+
+            // Validate player exists
+            if (player == null)
+            {
+                return NotFound("There is no player that has this id.");
+            }
+            return Ok(new { Message = "Successfully got player by ID", Data = player });
+        }
+
+        /// <summary>
+        /// Method to delete a player by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePlayer(int id)
+        {
+            // Find player in the SQL Database by ID
+            var player = await _context.Players.FindAsync(id);
+            // Validate player exists
+            if (player == null)
+            {
+                return NotFound("There is no player that has this id.");
+            }
+
+            // Remove player from SQL
+            _context.Players.Remove(player);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Successfully deleted player" });
         }
 
         /// <summary>
         /// Method to edit an existing player
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="updatedPlayer"></param>
-        /// <returns></returns>
         [HttpPut("{id}")]
-        public IActionResult EditPlayer(int id, [FromBody] Model.UpdatePlayerRequest request)
+        public async Task<IActionResult> EditPlayer(int id, [FromBody] UpdatePlayerRequest request)
         {
-            // Validate
+            // Validate request
             if (request == null)
             {
                 return BadRequest("Player data is null.");
             }
 
-            // Find player with matching ID
-            var player = _players.FirstOrDefault(x => x.Id == id);
+            // Find player in the SQL Database by ID
+            var player = await _context.Players.FindAsync(id);
 
-            // validate player exists
+            // Validate player exists
             if (player == null)
             {
                 return NotFound($"No player found with ID {id}.");
             }
 
-            // Update player details
-            player.UpdateInfo(request.FirstName, request.LastName, request.DateOfBirth);
+            // Update player details using the method we kept in the model
+            player.UpdateInfo(request.PlayerName, request.Position);
+
+            // Commit changes to SQL
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {
@@ -80,99 +144,24 @@ namespace PlayerManagementService.Controllers
         }
 
         /// <summary>
-        /// Method to delete a player
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpDelete("{id}")]
-        public IActionResult DeletePlayer(int id)
-        {
-            // Find player with matching ID
-            var player = _players.FirstOrDefault(x => x.Id == id);
-            // Check if players list is empty or player not found
-            if (_players == null || _players.Count == 0)
-            {
-                return BadRequest("There are no players to delete. Create a player.");
-            }
-            if (player == null)
-            {
-                return NotFound("There is no player that has this id.");
-            }
-            // Remove player from the list
-            _players.Remove(player);
-            return Ok(new
-            {
-                Message = "Successfully deleted player",
-            });
-        }
-
-        /// <summary>
-        /// Method to list all players
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public ActionResult<IEnumerable<Model.Player>> ListAllPlayers()
-        {
-            // Check if players list is empty
-            if (_players == null || _players.Count == 0)
-            {
-                return Ok(_players);
-            }
-            return Ok(new
-            {
-                Message = "Successfully listed all players",
-                Data = _players
-            });
-        }
-
-        // Graph??
-
-        /// <summary>
-        /// Method to get player by ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        public ActionResult<Model.Player> GetPlayerById(int id)
-        {
-            // Find player with matching ID
-            var player = _players.FirstOrDefault(x => x.Id == id);
-
-            // Check if players list is empty or player not found
-            if (_players == null || _players.Count == 0)
-            {
-                return BadRequest("There are no players to get by id. Create a player.");
-            }
-            if (player == null)
-            {
-                return NotFound("There is no player that has this id.");
-            }
-            return Ok(new
-            {
-                Message = "Successfully got player by ID",
-                Data = player
-            });
-        }
-
-        /// <summary>
         /// Method to draft a player to a team
         /// </summary>
-        /// <param name="playerId"></param>
-        /// <param name="teamId"></param>
-        /// <returns></returns>
         [HttpPost("draft/{playerId}/team/{teamId}")]
-        public IActionResult DraftPlayerToTeam(int playerId, int teamId)
+        public async Task<IActionResult> DraftPlayerToTeam(int playerId, int teamId)
         {
-            // Find player with matching ID
-            var player = _players.FirstOrDefault(x => x.Id == playerId);
+            // Find player
+            var player = await _context.Players.FindAsync(playerId);
 
-            // Validate
             if (player == null)
             {
                 return NotFound($"Player with ID {playerId} not found.");
             }
 
+            // Update state
             player.DraftToTeam(teamId);
+
+            // Save to SQL
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {
@@ -184,21 +173,22 @@ namespace PlayerManagementService.Controllers
         /// <summary>
         /// Method to release a player from a team
         /// </summary>
-        /// <param name="playerId"></param>
-        /// <returns></returns>
         [HttpPost("release/{playerId}")]
-        public IActionResult ReleasePlayerFromTeam(int playerId)
+        public async Task<IActionResult> ReleasePlayerFromTeam(int playerId)
         {
-            // Find player with matching ID
-            var player = _players.FirstOrDefault(x => x.Id == playerId);
+            // Find player
+            var player = await _context.Players.FindAsync(playerId);
 
-            // Validate
             if (player == null)
             {
                 return NotFound($"Player with ID {playerId} not found.");
             }
 
+            // Update state (sets TeamId to null)
             player.ReleaseFromTeam();
+
+            // Save to SQL
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {

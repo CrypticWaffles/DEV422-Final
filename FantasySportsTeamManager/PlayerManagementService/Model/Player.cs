@@ -1,59 +1,60 @@
-﻿namespace PlayerManagementService.Model
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace PlayerManagementService.Model
 {
+    [Table("Players")]
     public class Player
     {
-        public int Id { get; private set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public bool IsDrafted { get; private set; } = false;
-        public int TeamId { get; private set; } = -1;
+        [Key]
+        public int PlayerId { get; set; }
 
-        // Constructor
-        public Player(int id, string firstName, string lastName, DateTime dob)
+        public string PlayerName { get; set; } 
+
+        public string Position { get; set; }
+
+        public int? TeamId { get; set; }
+
+        public Player() { }
+
+        public Player(string playerName, string position)
         {
-            Id = id;
-            FirstName = firstName;
-            LastName = lastName;
-            DateOfBirth = dob;
-
-            IsDrafted = false;
-            TeamId = -1;
+            PlayerName = playerName;
+            Position = position;
+            TeamId = null; 
         }
 
-        // Methods to handle state changes
-        // Draft the player to a team
+        // --- Domain Methods ---
+
         public void DraftToTeam(int newTeamId)
         {
-            IsDrafted = true;
             TeamId = newTeamId;
         }
 
-        // Release the player from the team
         public void ReleaseFromTeam()
         {
-            IsDrafted = false;
-            TeamId = -1;
+            TeamId = null;
         }
-        public void UpdateInfo(string newFirstName, string newLastName, DateTime newDob)
+
+        public void UpdateInfo(string newName, string newPosition)
         {
-            FirstName = newFirstName;
-            LastName = newLastName;
-            DateOfBirth = newDob;
+            PlayerName = newName;
+            Position = newPosition;
         }
     }
 
-    public class PlayerCreationRequest
+    namespace PlayerManagementService.Model
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public DateTime DateOfBirth { get; set; }
-    }
+        public class UpdatePlayerRequest
+        {
+            public string PlayerName { get; set; }
+            public string Position { get; set; }
+        }
 
-    public class UpdatePlayerRequest
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public class PlayerCreationRequest
+        {
+            public string PlayerName { get; set; }
+            public string Position { get; set; }
+        }
     }
 }
