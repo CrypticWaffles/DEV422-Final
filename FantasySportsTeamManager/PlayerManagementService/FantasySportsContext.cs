@@ -17,7 +17,7 @@ namespace PlayerManagementService.Data
             modelBuilder.Entity<Player>().ToTable("Players");
 
             modelBuilder.Entity<Player>()
-                .Property(p => p.Id)
+                .Property(p => p.PlayerId)
                 .HasColumnName("playerId");
         }
     }

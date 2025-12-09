@@ -6,7 +6,18 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("FantasySportsDb");
 
 builder.Services.AddDbContext<FantasySportsContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("FantasySportsDb"),
+        sqlOptions =>
+        {
+            // Enable retry on failure for transient faults
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5, // Try 5 times
+                maxRetryDelay: TimeSpan.FromSeconds(30), // Wait up to 30 seconds between tries
+                errorNumbersToAdd: null
+            );
+        }
+    ));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
