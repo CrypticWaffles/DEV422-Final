@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 var conn = builder.Configuration.GetConnectionString("conn");
 builder.Services.AddDbContext<TeamManagementServiceContext>(options => 
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(conn);
 }
 );
 builder.Services.AddCors(options =>
@@ -57,6 +57,6 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<TeamManagementServiceContext>();
-    db.Database.Migrate;
+    db.Database.Migrate();
 }
 app.Run();

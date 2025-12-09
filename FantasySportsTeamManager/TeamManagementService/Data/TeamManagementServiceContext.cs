@@ -13,7 +13,7 @@ namespace TeamManagementService.Data
         {
             modelBuilder.Entity<Team>().HasData(
                 new Team{
-                    teamId=0,
+                    teamId=-1,
                     teamName="string",
                     createdDate=DateTime.Now
                 }
