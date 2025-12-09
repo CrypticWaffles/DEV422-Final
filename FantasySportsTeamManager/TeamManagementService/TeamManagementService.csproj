@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.22" />
-<<<<<<< HEAD:FantasySportsTeamManager/TeamManagementService/TeamManagementService.csproj
+ HEAD:FantasySportsTeamManager/TeamManagementService/TeamManagementService.csproj
 	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 	<PackageReference Include="xunit" Version="2.6.2" />
