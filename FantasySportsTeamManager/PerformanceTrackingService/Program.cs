@@ -10,9 +10,10 @@ using Polly;
 var builder = WebApplication.CreateBuilder(args);
 
 // EF Core: SQL Server
-var conn = builder.Configuration.GetConnectionString("PerformanceDb")
-           ?? throw new InvalidOperationException("ConnectionStrings:PerformanceDb missing");
-builder.Services.AddDbContext<PerformanceContext>(opt => opt.UseSqlServer(conn));
+
+var conn = builder.Configuration.GetConnectionString("DefaultConnection")
+           ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection missing");
+
 
 // Register the retry policy as a singleton so it can be injected into the DelegatingHandler
 builder.Services.AddSingleton<IAsyncPolicy<HttpResponseMessage>>(GetRetryPolicy());

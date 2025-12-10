@@ -1,4 +1,5 @@
-﻿using PlayerManagementService.Model;
+﻿
+using PlayerManagementService.Model;
 using PlayerManagementService.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,8 @@ namespace PlayerManagementService.Data
     {
         public static void SeedPlayers(FantasySportsContext context)
         {
-            // Check if players already exist. If so, do nothing.
             if (context.Players.Any())
-            {
                 return;
-            }
 
             var players = new List<Player>
             {
@@ -34,10 +32,7 @@ namespace PlayerManagementService.Data
                 new Player("Christian McCaffrey", "RB")
             };
 
-            // Add the list to the database context
             context.Players.AddRange(players);
-
-            // Save changes to insert rows into the SQL table
             context.SaveChanges();
         }
     }

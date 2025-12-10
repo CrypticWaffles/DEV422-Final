@@ -1,5 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+
 
 namespace PlayerManagementService.Model
 {
@@ -7,13 +11,16 @@ namespace PlayerManagementService.Model
     public class Player
     {
         [Key]
-        public int PlayerId { get; set; }
+        public Guid PlayerId { get; set; } // Matches UNIQUEIDENTIFIER (GUID)
 
-        public string PlayerName { get; set; } 
+        // Make required strings non-nullable (C# 11 'required' or default initializer)
 
-        public string Position { get; set; }
+        public string PlayerName { get; set; } = string.Empty;
+        public string Position { get; set; } = string.Empty;
 
-        public int? TeamId { get; set; }
+
+        // Undrafted = null; Drafted = Team GUID
+        public Guid? TeamId { get; set; }
 
         public Player() { }
 
@@ -21,12 +28,12 @@ namespace PlayerManagementService.Model
         {
             PlayerName = playerName;
             Position = position;
-            TeamId = null; 
+            TeamId = null;
         }
 
         // --- Domain Methods ---
 
-        public void DraftToTeam(int newTeamId)
+        public void DraftToTeam(Guid newTeamId)
         {
             TeamId = newTeamId;
         }
@@ -40,21 +47,6 @@ namespace PlayerManagementService.Model
         {
             PlayerName = newName;
             Position = newPosition;
-        }
-    }
-
-    namespace PlayerManagementService.Model
-    {
-        public class UpdatePlayerRequest
-        {
-            public string PlayerName { get; set; }
-            public string Position { get; set; }
-        }
-
-        public class PlayerCreationRequest
-        {
-            public string PlayerName { get; set; }
-            public string Position { get; set; }
         }
     }
 }

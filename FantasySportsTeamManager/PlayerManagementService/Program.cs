@@ -1,54 +1,65 @@
+
 using Microsoft.EntityFrameworkCore;
 using PlayerManagementService.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("FantasySportsDb");
+// ✅ Use a common, consistent key across services
+var conn = builder.Configuration.GetConnectionString("DefaultConnection")
+           ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection missing");
 
 builder.Services.AddDbContext<FantasySportsContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("FantasySportsDb"),
-        sqlOptions =>
-        {
-            // Enable retry on failure for transient faults
-            sqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 5, // Try 5 times
-                maxRetryDelay: TimeSpan.FromSeconds(30), // Wait up to 30 seconds between tries
-                errorNumbersToAdd: null
-            );
-        }
-    ));
+    options.UseSqlServer(conn, sqlOptions =>
+    {
+        // Enable retry on transient faults (Azure SQL best practice)
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null
+        );
+    })
+);
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Seed the database
+// ✅ Apply EF Core migrations and seed after app build
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
     try
     {
-        // Get the database context
         var context = services.GetRequiredService<FantasySportsContext>();
 
-        // Ensure the database is created
-        context.Database.EnsureCreated();
+        // Do NOT use EnsureCreated with migrations
+        //  Use Migrate so EF applies your migration history
+        context.Database.Migrate();
 
-        // Run the seeder
-        DataSeeder.SeedPlayers(context);
+        // Optional: seed only if needed
+        // e.g., if there are no players, seed the initial pool
+        if (!context.Players.Any())
+        {
+            DataSeeder.SeedPlayers(context);
+            logger.LogInformation("PlayerManagementService: Seeded initial players.");
+        }
+        else
+        {
+            logger.LogInformation("PlayerManagementService: Players already exist; skipping seed.");
+        }
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
+        var logger2 = services.GetRequiredService<ILogger<Program>>();
+        logger2.LogError(ex, "An error occurred while migrating/seeding the PlayerManagementService database.");
+        throw; // Fail fast if migrations can’t run
     }
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -56,9 +67,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
-app.Run();
