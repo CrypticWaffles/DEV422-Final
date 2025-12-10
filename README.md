@@ -9,7 +9,7 @@
 **Date:** Dec 7, 4:00 PM – 4:15 PM  
 **Team Members:** Miles Griffith, Peter Troendle, Sean Miles
 
-1. Team project pushed TeamManagementService **should (TASK FOR SEAN)** be >>>>>>> TeamManagementService
+1. Team project pushed TeamManagementService
 2. Player Project pushed PlayerManagementService
 3. Integration top
 4. Performance is now using the data 1 and 2 provide (Integration and Statistics)
