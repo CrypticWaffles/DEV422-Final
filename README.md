@@ -1,7 +1,22 @@
 
-**Note on next Meeting:** DEC 9 – Meeting 4 PM – Making the 5 min Video
+**Note on next Meeting:** DEC 10 – Meeting 6 PM 
+  1. Authentification back to ENTRA (Bellevue college credentials) All IP's should be alowed - will confirm the connection strings - DEC 10 morning
+  2. Showa all Postman Test - Endpoints
+  3.Show all Index + Making the 5 min Video
 
 # DEV 422 Final Project - Fantasy Sports Team Management System
+
+---
+
+## Meeting Minutes - Third Team Meeting
+**Date:** Dec 10, 4:00 PM – 4:15 PM  
+**Team Members:** Miles Griffith, Peter Troendle, Sean Miles
+  1. Authentification failed
+  2. IP's of other Teams members blocked
+  3. Did omit to start the project during the meeting hence no wonder:    
+  – All Postman Test failed to connect
+  – SQL Azure Database is facing Authentification issues / Plan : revert to ENTRA Authentif.
+
 
 ---
 
@@ -9,7 +24,7 @@
 **Date:** Dec 7, 4:00 PM – 4:15 PM  
 **Team Members:** Miles Griffith, Peter Troendle, Sean Miles
 
-1. Team project pushed TeamManagementService **should (TASK FOR SEAN)** be >>>>>>> TeamManagementService
+1. Team project pushed TeamManagementService
 2. Player Project pushed PlayerManagementService
 3. Integration top
 4. Performance is now using the data 1 and 2 provide (Integration and Statistics)
