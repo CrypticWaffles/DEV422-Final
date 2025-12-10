@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace TeamManagementService.Model
 {
+    [Table("Teams")]
     public class Team
     {
         [Key]
