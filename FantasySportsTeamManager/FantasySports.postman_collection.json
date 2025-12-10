@@ -1,55 +1,37 @@
+
 {
   "info": {
-    "name": "Fantasy Sports Team Manager – Combined APIs",
-    "_postman_id": "dev422-fantasy-collection",
-    "description": "Postman collection for Team Management, Player Management, and Performance Tracking services. Uses collection-level variables so it works even without selecting an environment.",
+    "name": "Fantasy Sports Team Manager – GUID-Ready",
+    "_postman_id": "dev422-fantasy-guid-collection",
+    "description": "Refactored Postman collection for Team, Player, and Performance services using GUIDs with helper requests to seed and capture IDs.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {
-      "key": "team_base_url",
-      "value": "https://localhost:7076"
-    },
-    {
-      "key": "player_base_url",
-      "value": "https://localhost:7063"
-    },
-    {
-      "key": "perf_base_url",
-      "value": "https://localhost:19699"
-    },
-    {
-      "key": "teamId",
-      "value": "1"
-    },
-    {
-      "key": "playerId",
-      "value": "1"
-    }
+    { "key": "team_base_url", "value": "https://localhost:7076" },
+    { "key": "player_base_url", "value": "https://localhost:7063" },
+    { "key": "perf_base_url", "value": "https://localhost:19699" },
+    { "key": "teamName", "value": "Test Team A" },
+    { "key": "playerNameA", "value": "Alice Adams" },
+    { "key": "playerNameB", "value": "Bob Baker" },
+    { "key": "teamId", "value": "" },
+    { "key": "playerId", "value": "" }
   ],
   "item": [
     {
-      "name": "Team Management Service",
+      "name": "Setup & Capture GUIDs",
       "item": [
         {
-          "name": "List Teams",
+          "name": "Create or Fetch Team → Save {{teamId}}",
           "request": {
-            "method": "GET",
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"teamName\": \"{{teamName}}\" }"
+            },
             "url": "{{team_base_url}}/api/teams"
-          }
-        },
-        {
-          "name": "Graph",
-          "request": {
-            "method": "GET",
-            "url": "{{team_base_url}}/api/graph"
-          }
-        },
-        {
-          "name": "Get Team by ID",
-          "request": {
-            "method": "GET",
-            "url": "{{team_base_url}}/api/teams/{{teamId}}"
           },
           "event": [
             {
@@ -57,7 +39,137 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status is 200', function(){ pm.response.to.have.status(200); });"
+                  "// Try to read teamId from create response; if not present, fallback to a GET",
+                  "pm.test('Create/Fallback Team: status ok', function(){ pm.expect([200,201]).to.include(pm.response.code); });",
+                  "let body = {};",
+                  "try { body = pm.response.json(); } catch(e) {}",
+                  "",
+                  "if (body && body.teamId) {",
+                  "  pm.environment.set('teamId', body.teamId);",
+                  "  console.log('Captured teamId from POST:', body.teamId);",
+                  "} else {",
+                  "  // Fallback: find by name via GET /api/teams",
+                  "  pm.sendRequest({",
+                  "    url: pm.variables.get('team_base_url') + '/api/teams',",
+                  "    method: 'GET'",
+                  "  }, function(err, res) {",
+                  "    if (err) { console.error(err); return; }",
+                  "    let list = [];",
+                  "    try { list = res.json(); } catch(e) {}",
+                  "    if (Array.isArray(list)) {",
+                  "      const match = list.find(t => (t.teamName || '').toLowerCase() === pm.variables.get('teamName').toLowerCase());",
+                  "      if (match && match.teamId) {",
+                  "        pm.environment.set('teamId', match.teamId);",
+                  "        console.log('Captured teamId from GET:', match.teamId);",
+                  "      }",
+                  "    }",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Players (Alice & Bob) if missing → Save {{playerId}} = Alice",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"playerName\": \"{{playerNameA}}\", \"position\": \"Forward\" }"
+            },
+            "url": "{{player_base_url}}/api/players"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Create/Fallback Player A: status ok', function(){ pm.expect([200,201]).to.include(pm.response.code); });",
+                  "let bodyA = {};",
+                  "try { bodyA = pm.response.json(); } catch(e) {}",
+                  "",
+                  "// Ensure Bob exists as well",
+                  "pm.sendRequest({",
+                  "  url: pm.variables.get('player_base_url') + '/api/players',",
+                  "  method: 'GET'",
+                  "}, function(err, res) {",
+                  "  if (err) { console.error(err); return; }",
+                  "  let list = [];",
+                  "  try { list = res.json(); } catch(e) {}",
+                  "",
+                  "  // If Alice not in response, fallback to find by name separately",
+                  "  let alice = Array.isArray(list) ? list.find(p => (p.playerName || '').toLowerCase() === pm.variables.get('playerNameA').toLowerCase()) : null;",
+                  "  if (!alice || !alice.playerId) {",
+                  "    // Try GET /api/players?name=Alice Adams if your API supports it; otherwise keep as is.",
+                  "  } else {",
+                  "    pm.environment.set('playerId', alice.playerId);",
+                  "    console.log('Captured playerId (Alice):', alice.playerId);",
+                  "  }",
+                  "",
+                  "  // Ensure Bob exists; if not, create",
+                  "  let bob = Array.isArray(list) ? list.find(p => (p.playerName || '').toLowerCase() === pm.variables.get('playerNameB').toLowerCase()) : null;",
+                  "  if (!bob) {",
+                  "    pm.sendRequest({",
+                  "      url: pm.variables.get('player_base_url') + '/api/players',",
+                  "      method: 'POST',",
+                  "      header: { 'Content-Type': 'application/json' },",
+                  "      body: {",
+                  "        mode: 'raw',",
+                  "        raw: JSON.stringify({ playerName: pm.variables.get('playerNameB'), position: 'Guard' })",
+                  "      }",
+                  "    }, function(err2, res2) {",
+                  "      if (err2) { console.error(err2); return; }",
+                  "      try {",
+                  "        const b = res2.json();",
+                  "        console.log('Created Bob, ID:', b.playerId);",
+                  "      } catch(e) {}",
+                  "    });",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Team Management Service",
+      "item": [
+        {
+          "name": "List Teams",
+          "request": { "method": "GET", "url": "{{team_base_url}}/api/teams" },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json();",
+                  "pm.test('Array returned', () => Array.isArray(data));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Team by ID",
+          "request": { "method": "GET", "url": "{{team_base_url}}/api/teams/{{teamId}}" },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const t = pm.response.json();",
+                  "pm.test('Has teamId', () => pm.expect(t.teamId).to.exist);"
                 ]
               }
             }
@@ -67,16 +179,8 @@
           "name": "Create Team",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"teamName\": \"Test Team\"}"
-            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"teamName\": \"{{teamName}}\" }" },
             "url": "{{team_base_url}}/api/teams"
           }
         },
@@ -84,25 +188,14 @@
           "name": "Update Team",
           "request": {
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"teamName\": \"Updated Team\"}"
-            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"teamName\": \"Updated {{teamName}}\" }" },
             "url": "{{team_base_url}}/api/teams/{{teamId}}"
           }
         },
         {
           "name": "Delete Team",
-          "request": {
-            "method": "DELETE",
-            "url": "{{team_base_url}}/api/teams/{{teamId}}"
-          }
+          "request": { "method": "DELETE", "url": "{{team_base_url}}/api/teams/{{teamId}}" }
         }
       ]
     },
@@ -111,56 +204,53 @@
       "item": [
         {
           "name": "List Players",
-          "request": {
-            "method": "GET",
-            "url": "{{player_base_url}}/api/players"
-          }
-        },
-        {
-          "name": "Graph",
-          "request": {
-            "method": "GET",
-            "url": "{{player_base_url}}/api/graph"
-          }
+          "request": { "method": "GET", "url": "{{player_base_url}}/api/players" }
         },
         {
           "name": "Get Player by ID",
+          "request": { "method": "GET", "url": "{{player_base_url}}/api/players/{{playerId}}" }
+        },
+        {
+          "name": "Create Player (manual)",
           "request": {
-            "method": "GET",
-            "url": "{{player_base_url}}/api/players/{{playerId}}"
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"playerName\": \"Charlie Clark\", \"position\": \"Center\" }" },
+            "url": "{{player_base_url}}/api/players"
           }
         },
         {
           "name": "Draft Player",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"playerId\": 1, \"teamId\": 1}"
-            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"playerId\": \"{{playerId}}\", \"teamId\": \"{{teamId}}\" }" },
             "url": "{{player_base_url}}/api/players/draft"
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200/204', () => pm.expect([200,204]).to.include(pm.response.code));",
+                  "let data = {};",
+                  "try { data = pm.response.json(); } catch(e) {}",
+                  "// If your API returns updated player",
+                  "if (data && data.teamId) {",
+                  "  pm.test('Player teamId matches env teamId', () => pm.expect(String(data.teamId).toLowerCase()).to.eql(String(pm.environment.get('teamId')).toLowerCase()));",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Release Player",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"playerId\": 1, \"teamId\": 1}"
-            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"playerId\": \"{{playerId}}\", \"teamId\": \"{{teamId}}\" }" },
             "url": "{{player_base_url}}/api/players/release"
           }
         }
@@ -171,56 +261,36 @@
       "item": [
         {
           "name": "Get All Performance Stats",
-          "request": {
-            "method": "GET",
-            "url": "{{perf_base_url}}/api/performance"
-          }
+          "request": { "method": "GET", "url": "{{perf_base_url}}/api/performance" }
         },
         {
           "name": "Get Player Stats",
-          "request": {
-            "method": "GET",
-            "url": "{{perf_base_url}}/api/performance/{{playerId}}"
-          }
+          "request": { "method": "GET", "url": "{{perf_base_url}}/api/performance/{{playerId}}" }
         },
         {
           "name": "Simulate Competition",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"competitionName\": \"TestCup\"}"
-            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"competitionName\": \"TestCup\" }" },
             "url": "{{perf_base_url}}/api/performance/simulate"
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200/201', () => pm.expect([200,201]).to.include(pm.response.code));",
+                  "let body = {};",
+                  "try { body = pm.response.json(); } catch(e) {}",
+                  "pm.test('Simulation response exists', () => pm.expect(body).to.exist);"
+                ]
+              }
+            }
+          ]
         }
       ]
-    }
-  ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          "// Pre-request script placeholder"
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          "// Collection-level tests placeholder"
-        ]
-      }
     }
   ]
 }
