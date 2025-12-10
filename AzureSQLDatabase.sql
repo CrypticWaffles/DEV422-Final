@@ -119,5 +119,18 @@ BEGIN
     CREATE INDEX IX_Perf_Player_Date ON dbo.PerformanceStats(playerId, gameDate DESC);
 END;
 
+--------------------------------------------------------
+-- SEEDS FOR TEST
+--------------------------------------------------------
+
+-- Create one test team
+INSERT INTO dbo.Teams (teamName) VALUES (N'Test Team A'); 
+-- Capture the teamId GUID
+SELECT teamId, teamName, createdDate FROM dbo.Teams WHERE teamName = N'Test Team A';
+
+-- Create two undrafted players
+INSERT INTO dbo.Players (playerName, position) VALUES (N'Alice Adams', N'Forward');
+INSERT INTO dbo.Players (playerName, position) VALUES (N'Bob Baker', N'Guard');
+-- Capture their GUIDs
 
 
