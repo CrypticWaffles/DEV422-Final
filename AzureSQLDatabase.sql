@@ -1,11 +1,8 @@
 
-CREATE USER [professor@bellevuecollege.edu] FROM EXTERNAL PROVIDER;
+
 CREATE USER [sean.miles@bellevuecollege.edu] FROM EXTERNAL PROVIDER;
 CREATE USER [miles.griffith@bellevuecollege.edu] FROM EXTERNAL PROVIDER;
 CREATE USER [usman.rizvi@bellevuecollege.edu] FROM EXTERNAL PROVIDER;
-
-ALTER ROLE db_datareader ADD MEMBER [professor@bellevuecollege.edu];
-ALTER ROLE db_datawriter ADD MEMBER [professor@bellevuecollege.edu];
 
 ALTER ROLE db_datareader ADD MEMBER [sean.miles@bellevuecollege.edu];
 ALTER ROLE db_datawriter ADD MEMBER [sean.miles@bellevuecollege.edu];
