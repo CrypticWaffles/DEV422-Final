@@ -1,0 +1,107 @@
+﻿
+#!/usr/bin/env bash
+# baseline-migrations.sh
+# Creates & applies an empty baseline migration for each service project.
+# Run from: DEV422-Final/FantasySportsTeamManager
+# Usage: bash baseline-migrations.sh
+
+set -eu
+set -o pipefail
+
+# Projects that contain their own DbContext + Migrations folder
+PROJECTS=("PlayerManagementService" "TeamManagementService" "PerformanceTrackingService")
+
+# If your DbContext type names differ and you need to target them explicitly,
+# you can map project -> context here and pass --context where needed.
+# declare -A CONTEXTS=( ["PlayerManagementService"]="FantasySportsContext"
+#                       ["TeamManagementService"]="TeamContext"
+#                       ["PerformanceTrackingService"]="PerformanceContext" )
+
+new_baseline_name() {
+  date +"Baseline_%Y%m%d_%H%M%S"
+}
+
+info()  { echo -e "\033[36m$*\033[0m"; }   # cyan
+good()  { echo -e "\033[32m$*\033[0m"; }   # green
+warn()  { echo -e "\033[33m$*\033[0m"; }   # yellow
+err()   { echo -e "\033[31m$*\033[0m" >&2; }
+
+# Replace the bodies of Up()/Down() with empty blocks using awk (portable, no perl)
+strip_up_down() {
+  # $1 = file path
+  awk '
+    BEGIN { in_up=0; in_down=0; }
+    {
+      line=$0
+      # Detect start of Up method
+      if (match(line, /protected[[:space:]]+override[[:space:]]+void[[:space:]]+Up\(MigrationBuilder[[:space:]]+migrationBuilder\)/)) {
+        print "protected override void Up(MigrationBuilder migrationBuilder)"
+        print "    {"
+        print "        // Baseline: no schema changes"
+        print "    }"
+        in_up=1
+        next
+      }
+      # Detect start of Down method
+      if (match(line, /protected[[:space:]]+override[[:space:]]+void[[:space:]]+Down\(MigrationBuilder[[:space:]]+migrationBuilder\)/)) {
+        print "protected override void Down(MigrationBuilder migrationBuilder)"
+        print "    {"
+        print "        // Baseline: no schema changes"
+        print "    }"
+        in_down=1
+        next
+      }
+      # Skip original body lines until the closing brace of the method
+      if (in_up==1 || in_down==1) {
+        # End of method when we hit a line containing only a closing brace
+        if ($0 ~ /^[[:space:]]*}\s*$/) {
+          # already printed a synthetic closing body; stop skipping
+          in_up=0; in_down=0;
+        }
+        next
+      }
+      # Default: print untouched
+      print line
+    }
+  ' "$1" > "$1.tmp"
+
+  mv "$1.tmp" "$1"
+}
+
+for proj in "${PROJECTS[@]}"; do
+  info "\n===> Baseline for project: ${proj}"
+  if [ ! -d "$proj" ]; then
+    err "Project path not found: $proj"
+    continue
+  fi
+
+  pushd "$proj" >/dev/null
+
+  baseline_name="$(new_baseline_name)"
+  info "Adding empty migration: ${baseline_name}"
+
+  # If you need to target a specific context, uncomment and pass --context "${CONTEXTS[$proj]}"
+  dotnet ef migrations add "${baseline_name}"
+
+  migrations_dir="Migrations"
+  # Find the generated migration code file (not the .Designer snapshot)
+  migration_file="$(ls "${migrations_dir}"/*_"${baseline_name}".cs 2>/dev/null | grep -v '\.Designer\.cs' | head -n1 || true)"
+
+  if [ -z "${migration_file}" ]; then
+    err "Could not find migration file for ${baseline_name} under ${migrations_dir}"
+    popd >/dev/null
+    continue
+  fi
+
+  info "Editing file: ${migration_file}"
+  strip_up_down "${migration_file}"
+
+  info "Applying baseline migration to database…"
+  dotnet ef database update
+
+  popd >/dev/null
+  good "Baseline applied for ${proj}"
+done
+
+warn "\nAll baselines processed."
+warn "Next: add real migrations for model changes (e.g., dotnet ef migrations add AddNewColumnToX)"

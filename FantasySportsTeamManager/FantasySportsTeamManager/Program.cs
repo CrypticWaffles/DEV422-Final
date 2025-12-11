@@ -4,30 +4,40 @@ using FantasySportsTeamManager.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DB connection
+// 1) Services
 var conn = builder.Configuration.GetConnectionString("DefaultConnection")
            ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection missing");
 
 builder.Services.AddDbContext<LeaderboardContext>(options =>
-    options.UseSqlServer(conn, sqlOptions =>
-    {
-        sqlOptions.EnableRetryOnFailure(maxRetryCount: 5,
-                                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                                        errorNumbersToAdd: null);
-    }));
-
+    options.UseSqlServer(conn));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Optional: log the effective connection string (dev-only)
+Console.WriteLine($"[Startup] DefaultConnection = {conn}");
+
 var app = builder.Build();
 
+// 2) Startup migration guard (prevents duplicate create errors)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<LeaderboardContext>();
-    db.Database.Migrate();   // applies EF migrations if present
+    var pending = db.Database.GetPendingMigrations().ToList();
+
+    if (pending.Any())
+    {
+        Console.WriteLine($"[Startup] Applying {pending.Count} migration(s): {string.Join(", ", pending)}");
+        db.Database.Migrate();
+        Console.WriteLine("[Startup] Migrations applied successfully.");
+    }
+    else
+    {
+        Console.WriteLine("[Startup] No pending migrations.");
+    }
 }
 
+// 3) Middleware & endpoints
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -37,4 +47,11 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+// 4) Ensure Kestrel listens on the same ports as launchSettings.json
+// (HTTPS: 7284, HTTP: 5054). This helps avoid "page can't be found" when the app
+// starts on a different port/profile. You can remove the HTTP URL later.
+app.Urls.Add("https://localhost:7284");
+app.Urls.Add("http://localhost:5054");
+
 app.Run();

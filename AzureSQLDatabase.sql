@@ -14,6 +14,15 @@ ALTER ROLE db_datareader ADD MEMBER [usman.rizvi@bellevuecollege.edu];
 ALTER ROLE db_datawriter ADD MEMBER [usman.rizvi@bellevuecollege.edu];
 
 
+-- RUN THIS IN YOUR APPLICATION DATABASE (not master)
+-- e.g., MyAppDb
+CREATE USER [myappuser] WITH PASSWORD = 'Strong!Passw0rdGoesHere';
+ALTER ROLE db_datareader ADD MEMBER [myappuser];
+ALTER ROLE db_datawriter ADD MEMBER [myappuser];
+-- If migrations need schema changes:
+ALTER ROLE db_ddladmin  ADD MEMBER [myappuser];
+-- Or full ownership (be careful; broad privileges):
+-- EXEC sp_addrolemember N'db_owner', N'myappuser';
 
 --------------------------------------------
 -- Teams (owned by Team Management Service)
