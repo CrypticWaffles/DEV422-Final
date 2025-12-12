@@ -1,4 +1,3 @@
-
 using System.Net.Http.Json;
 using PerformanceTrackingService.Models;
 
@@ -11,8 +10,14 @@ public class PlayerClient
 
     public async Task<List<PlayerDto>> GetAllAsync(CancellationToken ct = default)
     {
-        // Assumes Player service exposes GET /api/players returning JSON array
-        var players = await _http.GetFromJsonAsync<List<PlayerDto>>("/api/players", cancellationToken: ct);
-        return players ?? new List<PlayerDto>();
+        var response = await _http.GetFromJsonAsync<PlayerResponse>("/api/player", cancellationToken: ct);
+
+        return response?.data ?? new List<PlayerDto>();
     }
+}
+
+public class PlayerResponse
+{
+    public string? message { get; set; }
+    public List<PlayerDto>? data { get; set; }
 }
