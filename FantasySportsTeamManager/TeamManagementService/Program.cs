@@ -36,8 +36,10 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<TeamManagementServiceContext>();
-    db.Database.Migrate(); // ✅ Remove EnsureCreated() for EF migrations
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<TeamManagementServiceContext>();
+
+    db.Database.Migrate();
 }
 
 if (app.Environment.IsDevelopment())

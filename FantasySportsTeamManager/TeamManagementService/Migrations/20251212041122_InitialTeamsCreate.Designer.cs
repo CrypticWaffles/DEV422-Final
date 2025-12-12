@@ -12,8 +12,8 @@ using TeamManagementService.Data;
 namespace TeamManagementService.Migrations
 {
     [DbContext(typeof(TeamManagementServiceContext))]
-    [Migration("20251209012421_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251212041122_InitialTeamsCreate")]
+    partial class InitialTeamsCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,10 @@ namespace TeamManagementService.Migrations
 
             modelBuilder.Entity("TeamManagementService.Model.Team", b =>
                 {
-                    b.Property<int>("teamId")
+                    b.Property<Guid>("teamId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("teamId"));
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("teamId");
 
                     b.Property<DateTime>("createdDate")
                         .HasColumnType("datetime2");
@@ -42,15 +41,7 @@ namespace TeamManagementService.Migrations
 
                     b.HasKey("teamId");
 
-                    b.ToTable("Teams");
-
-                    b.HasData(
-                        new
-                        {
-                            teamId = -1,
-                            createdDate = new DateTime(2025, 12, 8, 17, 24, 16, 872, DateTimeKind.Local).AddTicks(8584),
-                            teamName = "string"
-                        });
+                    b.ToTable("Teams", (string)null);
                 });
 #pragma warning restore 612, 618
         }

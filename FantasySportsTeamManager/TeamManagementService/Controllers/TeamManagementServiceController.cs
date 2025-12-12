@@ -1,126 +1,78 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using PlayerManagementService;
-using TeamManagementService.Model;
-using PlayerManagementService.Controllers;
-using TeamManagementService.Data;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TeamManagementService.Data;
+using TeamManagementService.Model;
+
 namespace TeamManagementService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class TeamManagementServiceController : ControllerBase
     {
-        private static readonly List<Team> _teams= new List<Team>();
-        private readonly TeamManagementServiceContext context;
-        public TeamManagementServiceController(TeamManagementServiceContext TeamManagementServiceContext)
+        private readonly TeamManagementServiceContext _context;
+
+        public TeamManagementServiceController(TeamManagementServiceContext context)
         {
-            this.context = TeamManagementServiceContext;
+            _context = context;
         }
-        [HttpGet("teams")]
+
+        [HttpGet] // Changed from "teams" to match standard REST style
         public async Task<IActionResult> ListAllTeams()
         {
-            return Ok(new
-            {
-                Message = "Successfully listed all teams",
-                Data = await context.Teams.ToListAsync()+"\n"+_teams
-            });
+            var teams = await _context.Teams.ToListAsync();
+            return Ok(new { Message = "Successfully listed all teams", Data = teams });
         }
-        [HttpGet("graph")]
-        public IActionResult GetGraph()
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetTeamById(Guid id)
         {
-            //PlayerController playerController = new PlayerController();
-            //playerController.ListAllPlayers();
-            return Ok(new
-            {
-                Message = "Successfully retrieved Graph",
-                Data = "WIP: GRAPH"//playerController
-            });
-        }
-        [HttpGet("teams/{id}")]
-        public async Task<ActionResult> GetTeamById(int id)
-        {
-            var team = await context.Teams.FirstOrDefaultAsync(x => x.teamId == id); 
-            var listteam = _teams.FirstOrDefault(x => x.teamId == id);
-            if (_teams == null || _teams.Count == 0 || context.Teams.Count() == 0)
-            {
-                return BadRequest("There are no teams to get by id. Create a team.");
-            }
-            if (team == null || listteam == null)
-            {
-                return NotFound("There is no team that has this id.");
-            }
-            return Ok(new
-            {
-                Message = "Successfully got team by ID",
-                Data = team+"\n"+listteam
-            });
-        }
-        [HttpPost("teams")]
-        public async Task<IActionResult> CreateNewTeam(Team team)
-        {
+            var team = await _context.Teams.FindAsync(id);
+
             if (team == null)
             {
-                return Unauthorized("Team's fields are null.");
+                return NotFound("There is no team that has this id.");
             }
+            return Ok(new { Message = "Successfully got team by ID", Data = team });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateNewTeam([FromBody] Team team)
+        {
+            if (team == null) return BadRequest("Team data is null.");
+
+            team.teamId = Guid.NewGuid();
             team.createdDate = DateTime.Now;
-            _teams.Add(team);
-            team.teamId = _teams.Count;
-            await context.Teams.AddAsync(team);
-            team.teamId = context.Teams.Count();
-            context.SaveChanges();
-            return Ok(new
-            {
-                Message = "Successfully created new team",
-                Data = team
-            });
+
+            _context.Teams.Add(team);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Successfully created new team", Data = team });
         }
-        [HttpPut("teams/{id}")]
-        public async Task<IActionResult> UpdateTeamDetails(int id,Team team)
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTeamDetails(Guid id, [FromBody] Team team)
         {
-            var verifyteam = await context.Teams.FirstOrDefaultAsync(x => x.teamId == id);
-            var listteam = _teams.FirstOrDefault(x => x.teamId == id);
-            if (_teams == null || _teams.Count == 0 || context.Teams.Count() == 0)
-            {
-                return BadRequest("There are no teams to update. Create a team.");
-            }
-            if(team == null)
-            {
-                return BadRequest("Team's fields are null");
-            }
-            if (verifyteam == null || listteam == null)
-            {
-                return NotFound("There is no team that has this id.");
-            }
-            verifyteam.teamName=team.teamName;
-            context.SaveChanges();
-            return Ok(new
-            {
-                Message = "Successfully updated team details",
-                Data = verifyteam
-            });
+            var existingTeam = await _context.Teams.FindAsync(id);
+            if (existingTeam == null) return NotFound("Team not found.");
+
+            // Update only the name
+            existingTeam.teamName = team.teamName;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Successfully updated team details", Data = existingTeam });
         }
-        [HttpDelete("teams/{id}")]
-        public async Task<IActionResult> DeleteTeam(int id)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTeam(Guid id)
         {
-            var verifyteam = await context.Teams.FirstOrDefaultAsync(x => x.teamId == id);
-            if (_teams == null || _teams.Count == 0 || context.Teams.Count() == 0)
-            {
-                return BadRequest("There are no teams to delete. Create a team.");
-            }
-            if (verifyteam == null)
-            {
-                return NotFound("There is no team that has this id.");
-            }
-            _teams.RemoveAt(id - 1);
-            context.Teams.Remove(verifyteam);
-            context.SaveChanges();
-            return Ok(new
-            {
-                Message = "Successfully deleted team",
-                Data = verifyteam
-            });
+            var team = await _context.Teams.FindAsync(id);
+            if (team == null) return NotFound("Team not found.");
+
+            _context.Teams.Remove(team);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Successfully deleted team" });
         }
     }
 }
