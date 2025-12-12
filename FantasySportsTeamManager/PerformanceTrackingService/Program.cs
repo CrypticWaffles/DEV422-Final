@@ -1,3 +1,4 @@
+
 using Microsoft.EntityFrameworkCore;
 using PerformanceTrackingService.Data;
 using PerformanceTrackingService.Services;
@@ -10,10 +11,13 @@ var conn = builder.Configuration.GetConnectionString("DefaultConnection")
 builder.Services.AddDbContext<PerformanceContext>(options =>
     options.UseSqlServer(conn));
 
-builder.Services.AddHttpClient<PlayerClient>(client =>
+builder.Services.AddHttpClient<PlayerClient>((sp, http) =>
 {
-    client.BaseAddress = new Uri("https://localhost:7063"); 
+    var cfg = sp.GetRequiredService<IConfiguration>();
+    var baseUrl = (cfg["PlayerServiceBaseUrl"] ?? "https://localhost:7063").TrimEnd('/');
+    http.BaseAddress = new Uri(baseUrl);
 });
+
 builder.Services.AddSingleton<StatsGenerator>();
 
 builder.Services.AddControllers();
@@ -50,8 +54,5 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
-app.Urls.Add("https://localhost:7284");
-app.Urls.Add("http://localhost:5054");
 
 app.Run();

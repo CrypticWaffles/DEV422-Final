@@ -25,7 +25,7 @@ public class PerformanceController : ControllerBase
         _db = db;
         _playerClient = playerClient;
         _gen = gen;
-        _leaderboardBase = cfg["LeaderboardServiceBaseUrl"];
+        _leaderboardBase = cfg["LeaderboardServiceBaseUrl"]?.TrimEnd('/');
     }
 
     // GET /api/performance
@@ -47,13 +47,15 @@ public class PerformanceController : ControllerBase
     }
 
     // POST /api/performance/simulate
-    public record SimRequest(string name);
+    public record SimRequest(string competitionName);
     public record SimResult(string competition, int createdRecords);
 
     [HttpPost("simulate")]
     public async Task<ActionResult<SimResult>> Simulate([FromBody] SimRequest req, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(req.name)) return BadRequest("competition name required");
+        var name = req.competitionName?.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+            return BadRequest("competitionName is required");
 
         // 1) Get players and filter drafted
         var players = await _playerClient.GetAllAsync(ct);
@@ -71,14 +73,14 @@ public class PerformanceController : ControllerBase
                 assists = ast,
                 rebounds = reb,
                 gameDate = now,
-                competitionName = req.name
+                competitionName = name
             };
         }).ToList();
 
         _db.PerformanceStats.AddRange(rows);
         await _db.SaveChangesAsync(ct);
 
-        // 3) Optionally notify Leaderboard service
+        // 3) Best-effort notify Leaderboard service (if configured)
         if (!string.IsNullOrWhiteSpace(_leaderboardBase))
         {
             _ = Task.Run(async () =>
@@ -86,13 +88,15 @@ public class PerformanceController : ControllerBase
                 try
                 {
                     using var http = new HttpClient { BaseAddress = new Uri(_leaderboardBase!) };
-                    // e.g., POST /api/leaderboard/refresh or similar (adjust to your implementation)
                     await http.PostAsync("/api/leaderboard/refresh", content: null);
                 }
-                catch { /* best-effort notification */ }
+                catch
+                {
+                    // ignore notification errors
+                }
             });
         }
 
-        return Ok(new SimResult(req.name, rows.Count));
+        return Ok(new SimResult(name!, rows.Count));
     }
 }
