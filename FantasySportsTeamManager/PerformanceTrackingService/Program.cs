@@ -11,6 +11,7 @@ var conn = builder.Configuration.GetConnectionString("DefaultConnection")
 builder.Services.AddDbContext<PerformanceContext>(options =>
     options.UseSqlServer(conn));
 
+// Use config if available; fallback to localhost for dev
 builder.Services.AddHttpClient<PlayerClient>((sp, http) =>
 {
     var cfg = sp.GetRequiredService<IConfiguration>();
@@ -28,6 +29,7 @@ Console.WriteLine($"[Startup] DefaultConnection = {conn}");
 
 var app = builder.Build();
 
+// Apply any pending migrations
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PerformanceContext>();
@@ -55,4 +57,3 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();

@@ -18,7 +18,7 @@ public class PlayerClient
 
     public async Task<List<PlayerDto>> GetAllAsync(CancellationToken ct = default)
     {
-        // PlayerManagementService returns { Message, Data: [...] }
+        // PlayerManagementService returns { Message, Data: [...] } at /api/player
         var env = await _http.GetFromJsonAsync<PlayerResponse>("/api/player", _json, ct);
         return env?.Data ?? new List<PlayerDto>();
     }

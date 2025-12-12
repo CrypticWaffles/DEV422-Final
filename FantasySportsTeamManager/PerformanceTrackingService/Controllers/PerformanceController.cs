@@ -29,11 +29,51 @@ public class PerformanceController : ControllerBase
     }
 
     // GET /api/performance
+    // If no stats exist yet but there are drafted players, auto-seed one batch
+    // so the list is not empty during demos/tests.
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PerformanceStat>>> GetAll(CancellationToken ct)
     {
-        var q = _db.PerformanceStats.AsNoTracking().OrderByDescending(s => s.gameDate);
-        return Ok(await q.ToListAsync(ct));
+        var existing = await _db.PerformanceStats
+            .AsNoTracking()
+            .OrderByDescending(s => s.gameDate)
+            .ToListAsync(ct);
+
+        if (existing.Count > 0)
+            return Ok(existing);
+
+        // No stats yet → best-effort auto-seed for drafted players
+        var players = await _playerClient.GetAllAsync(ct);
+        var drafted = players.Where(p => p.teamId is not null).ToList();
+
+        if (drafted.Count == 0)
+            return Ok(existing); // still empty, nothing to seed
+
+        var now = DateTimeOffset.UtcNow;
+        var rows = drafted.Select(p =>
+        {
+            var (pts, ast, reb) = _gen.GenerateFor(p.position);
+            return new PerformanceStat
+            {
+                playerId = p.playerId,
+                points = pts,
+                assists = ast,
+                rebounds = reb,
+                gameDate = now,
+                competitionName = "AutoSeed"
+            };
+        }).ToList();
+
+        _db.PerformanceStats.AddRange(rows);
+        await _db.SaveChangesAsync(ct);
+
+        // Return freshly seeded rows
+        var seeded = await _db.PerformanceStats
+            .AsNoTracking()
+            .OrderByDescending(s => s.gameDate)
+            .ToListAsync(ct);
+
+        return Ok(seeded);
     }
 
     // GET /api/performance/{playerId}
@@ -57,11 +97,9 @@ public class PerformanceController : ControllerBase
         if (string.IsNullOrWhiteSpace(name))
             return BadRequest("competitionName is required");
 
-        // 1) Get players and filter drafted
         var players = await _playerClient.GetAllAsync(ct);
         var drafted = players.Where(p => p.teamId is not null).ToList();
 
-        // 2) Generate stats and persist
         var now = DateTimeOffset.UtcNow;
         var rows = drafted.Select(p =>
         {
@@ -80,7 +118,6 @@ public class PerformanceController : ControllerBase
         _db.PerformanceStats.AddRange(rows);
         await _db.SaveChangesAsync(ct);
 
-        // 3) Best-effort notify Leaderboard service (if configured)
         if (!string.IsNullOrWhiteSpace(_leaderboardBase))
         {
             _ = Task.Run(async () =>
@@ -90,10 +127,7 @@ public class PerformanceController : ControllerBase
                     using var http = new HttpClient { BaseAddress = new Uri(_leaderboardBase!) };
                     await http.PostAsync("/api/leaderboard/refresh", content: null);
                 }
-                catch
-                {
-                    // ignore notification errors
-                }
+                catch { /* ignore */ }
             });
         }
 
