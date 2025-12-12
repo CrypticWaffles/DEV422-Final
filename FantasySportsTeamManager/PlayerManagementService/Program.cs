@@ -4,14 +4,14 @@ using PlayerManagementService.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Use a common, consistent key across services
-var conn = builder.Configuration.GetConnectionString("DefaultConnection")
-           ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection missing");
+// 1. Get the connection string (Make sure "DefaultConnection" matches your appsettings.json)
+var conn = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// 2. Register the Database Context
 builder.Services.AddDbContext<FantasySportsContext>(options =>
     options.UseSqlServer(conn, sqlOptions =>
     {
-        // Enable retry on transient faults (Azure SQL best practice)
+        // This makes the app resilient to transient Azure errors
         sqlOptions.EnableRetryOnFailure(
             maxRetryCount: 5,
             maxRetryDelay: TimeSpan.FromSeconds(30),
@@ -60,12 +60,14 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-if (app.Environment.IsDevelopment())
-{
+
+
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+app.Run();

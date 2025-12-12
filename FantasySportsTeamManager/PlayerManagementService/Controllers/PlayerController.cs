@@ -39,7 +39,7 @@ namespace PlayerManagementService.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPlayerById(int id)
+        public async Task<IActionResult> GetPlayerById(Guid id)
         {
             var player = await _context.Players.FindAsync(id);
             if (player == null) return NotFound("There is no player that has this id.");
@@ -47,7 +47,7 @@ namespace PlayerManagementService.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePlayer(int id)
+        public async Task<IActionResult> DeletePlayer(Guid id)
         {
             var player = await _context.Players.FindAsync(id);
             if (player == null) return NotFound("There is no player that has this id.");
@@ -59,12 +59,17 @@ namespace PlayerManagementService.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditPlayer(int id, [FromBody] UpdatePlayerRequest request)
+        public async Task<IActionResult> EditPlayer(Guid id, [FromBody] UpdatePlayerRequest request)
         {
             if (request == null) return BadRequest("Player data is null.");
 
             var player = await _context.Players.FindAsync(id);
             if (player == null) return NotFound($"No player found with ID {id}.");
+
+            if (string.IsNullOrWhiteSpace(request.PlayerName))
+            {
+                return BadRequest("Player name cannot be empty.");
+            }
 
             player.UpdateInfo(request.PlayerName, request.Position);
             await _context.SaveChangesAsync();
@@ -73,7 +78,7 @@ namespace PlayerManagementService.Controllers
         }
 
         [HttpPost("draft/{playerId}/team/{teamId}")]
-        public async Task<IActionResult> DraftPlayerToTeam(int playerId, Guid teamId)
+        public async Task<IActionResult> DraftPlayerToTeam(Guid playerId, Guid teamId)
         {
             var player = await _context.Players.FindAsync(playerId);
             if (player == null) return NotFound($"Player with ID {playerId} not found.");
@@ -85,7 +90,7 @@ namespace PlayerManagementService.Controllers
         }
 
         [HttpPost("release/{playerId}")]
-        public async Task<IActionResult> ReleasePlayerFromTeam(int playerId)
+        public async Task<IActionResult> ReleasePlayerFromTeam(Guid playerId)
         {
             var player = await _context.Players.FindAsync(playerId);
             if (player == null) return NotFound($"Player with ID {playerId} not found.");

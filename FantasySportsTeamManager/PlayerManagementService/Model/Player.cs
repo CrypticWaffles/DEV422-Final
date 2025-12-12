@@ -26,6 +26,7 @@ namespace PlayerManagementService.Model
 
         public Player(string playerName, string position)
         {
+            PlayerId = Guid.NewGuid();
             PlayerName = playerName;
             Position = position;
             TeamId = null;
